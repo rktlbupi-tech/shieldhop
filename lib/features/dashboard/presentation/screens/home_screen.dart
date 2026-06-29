@@ -127,8 +127,8 @@ class _HomeScreen3State extends State<HomeScreen3> {
       case 'accepted':
         return (
           label: 'In Progress',
-          color: const Color(0xFF1F5BF6),
-          bg: const Color(0xFFEAF1FE)
+          color: AppColors.primary,
+          bg: AppColors.primaryLightest
         );
       default:
         return (
@@ -296,7 +296,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2E66FF), Color(0xFF1540C0)],
+          colors: [AppColors.primaryLight, AppColors.primaryDark],
         ),
       ),
       child: Column(
@@ -392,7 +392,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                           width: 68.w,
                           height: 68.w,
                           decoration: const BoxDecoration(
-                            color: Color(0xFF1742C7),
+                            color: AppColors.primaryDark,
                             shape: BoxShape.circle,
                           ),
                           child: Column(
@@ -478,14 +478,14 @@ class _HomeScreen3State extends State<HomeScreen3> {
                 children: [
                   Icon(
                     isOnline ? Icons.logout : Icons.login,
-                    color: const Color(0xFF1540C0),
+                    color: AppColors.primaryDark,
                     size: 16.sp,
                   ),
                   SizedBox(width: 8.w),
                   Text(
                     isOnline ? 'Log Off Duty' : 'Log On Duty',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: const Color(0xFF1540C0),
+                      color: AppColors.primaryDark,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -540,13 +540,13 @@ class _HomeScreen3State extends State<HomeScreen3> {
                   width: 34.w,
                   height: 34.w,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF1FE),
+                    color: AppColors.primaryLightest,
                     borderRadius: BorderRadius.circular(11.r),
-                    border: Border.all(color: const Color(0xFFD5E2FD)),
+                    border: Border.all(color: AppColors.primaryBorder),
                   ),
                   child: Icon(
                     LucideIcons.list_todo,
-                    color: const Color(0xFF1F5BF6),
+                    color: AppColors.primary,
                     size: 16.sp,
                   ),
                 ),
@@ -587,7 +587,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildTaskStatColumn('${_home?.tasks.assigned ?? 0}', 'ACCEPTED',
-                  const Color(0xFF1F5BF6)),
+                  AppColors.primary),
               Container(width: 1, height: 24.h, color: const Color(0xFFE5E8EE)),
               _buildTaskStatColumn('${_home?.tasks.completed ?? 0}',
                   'COMPLETED', const Color(0xFF127A45)),
@@ -611,7 +611,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                     : 0,
                 backgroundColor: const Color(0xFFE5E8EE),
                 valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFF1F5BF6),
+                  AppColors.primary,
                 ),
               ),
             ),
@@ -848,13 +848,13 @@ class _HomeScreen3State extends State<HomeScreen3> {
               ),
               _buildAttentionItem(
                 icon: LucideIcons.bell,
-                iconColor: const Color(0xFF1F5BF6),
-                iconBgColor: const Color(0xFFEAF1FE),
-                iconBorderColor: const Color(0xFFD5E2FD),
+                iconColor: AppColors.primary,
+                iconBgColor: AppColors.primaryLightest,
+                iconBorderColor: AppColors.primaryBorder,
                 title: 'Unread notifications',
                 subtitle: 'Tap to view your notifications',
                 badgeText: '${na?.notificationsUnread ?? 0}',
-                badgeColor: const Color(0xFF1F5BF6),
+                badgeColor: AppColors.primary,
                 onTap: () => context.push(AppRoutes.notifications),
               ),
               Padding(
@@ -863,13 +863,13 @@ class _HomeScreen3State extends State<HomeScreen3> {
               ),
               _buildAttentionItem(
                 icon: LucideIcons.message_square,
-                iconColor: const Color(0xFF1F5BF6),
-                iconBgColor: const Color(0xFFEAF1FE),
-                iconBorderColor: const Color(0xFFD5E2FD),
+                iconColor: AppColors.primary,
+                iconBgColor: AppColors.primaryLightest,
+                iconBorderColor: AppColors.primaryBorder,
                 title: 'Unread chats',
                 subtitle: 'Priya K. · Daily Globe desk',
                 badgeText: '2',
-                badgeColor: const Color(0xFF1F5BF6),
+                badgeColor: AppColors.primary,
                 onTap: () => _navigateToTab(3),
               ),
               Padding(
@@ -891,7 +891,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                         Text(
                           'Show more',
                           style: TextStyle(
-                            color: const Color(0xFF1F5BF6),
+                            color: AppColors.primary,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'AirbnbCereal',
@@ -900,7 +900,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                         SizedBox(width: 4.w),
                         Icon(
                           Icons.chevron_right,
-                          color: const Color(0xFF1F5BF6),
+                          color: AppColors.primary,
                           size: 16.sp,
                         ),
                       ],
@@ -1065,7 +1065,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 11.w, vertical: 9.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1F5BF6),
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Row(
@@ -1113,13 +1113,13 @@ class _HomeScreen3State extends State<HomeScreen3> {
                   width: 34.w,
                   height: 34.w,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF1FE),
+                    color: AppColors.primaryLightest,
                     borderRadius: BorderRadius.circular(11.r),
-                    border: Border.all(color: const Color(0xFFD5E2FD)),
+                    border: Border.all(color: AppColors.primaryBorder),
                   ),
                   child: Icon(
                     LucideIcons.briefcase,
-                    color: const Color(0xFF1F5BF6),
+                    color: AppColors.primary,
                     size: 16.sp,
                   ),
                 ),
@@ -1631,7 +1631,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFF2E66FF), Color(0xFF1540C0)],
+                      colors: [AppColors.primaryLight, AppColors.primaryDark],
                     ),
                     borderRadius: BorderRadius.circular(11.r),
                   ),
@@ -1700,10 +1700,10 @@ class _HomeScreen3State extends State<HomeScreen3> {
                         width: 8.w,
                         height: 8.w,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEAF1FE),
+                          color: AppColors.primaryLightest,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFF1F5BF6),
+                            color: AppColors.primary,
                             width: 1.5,
                           ),
                         ),
@@ -1787,13 +1787,13 @@ class _HomeScreen3State extends State<HomeScreen3> {
                   width: 34.w,
                   height: 34.w,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF1FE),
+                    color: AppColors.primaryLightest,
                     borderRadius: BorderRadius.circular(11.r),
-                    border: Border.all(color: const Color(0xFFD5E2FD)),
+                    border: Border.all(color: AppColors.primaryBorder),
                   ),
                   child: Icon(
                     LucideIcons.car,
-                    color: const Color(0xFF1F5BF6),
+                    color: AppColors.primary,
                     size: 16.sp,
                   ),
                 ),
@@ -1860,10 +1860,10 @@ class _HomeScreen3State extends State<HomeScreen3> {
                     v?.photoUrl ?? '',
                     fit: BoxFit.cover,
                     errorBuilder: (ctx, err, st) => Container(
-                      color: const Color(0xFFEAF1FE),
+                      color: AppColors.primaryLightest,
                       child: Icon(
                         LucideIcons.car,
-                        color: const Color(0xFF1F5BF6),
+                        color: AppColors.primary,
                         size: 38.sp,
                       ),
                     ),
@@ -1994,12 +1994,12 @@ class _HomeScreen3State extends State<HomeScreen3> {
                         width: 28.w,
                         height: 28.w,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEAF1FE),
+                          color: AppColors.primaryLightest,
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Icon(
                           LucideIcons.map_pin,
-                          color: const Color(0xFF1F5BF6),
+                          color: AppColors.primary,
                           size: 13.sp,
                         ),
                       ),
@@ -2045,7 +2045,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                           Text(
                             t.$4,
                             style: TextStyle(
-                              color: const Color(0xFF1F5BF6),
+                              color: AppColors.primary,
                               fontSize: 10.sp,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'AirbnbCereal',
@@ -2072,12 +2072,12 @@ class _HomeScreen3State extends State<HomeScreen3> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(5.r),
-        border: Border.all(color: const Color(0xFFD5E2FD)),
+        border: Border.all(color: AppColors.primaryBorder),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: const Color(0xFF1F5BF6),
+          color: AppColors.primary,
           fontSize: 8.5.sp,
           fontWeight: FontWeight.w600,
           fontFamily: 'AirbnbCereal',

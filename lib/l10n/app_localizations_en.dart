@@ -9,8 +9,8 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Shieldhop';
+  String get appTitle => 'ShieldHop';
 
   @override
-  String get welcomeMessage => 'Welcome to Shieldhop';
+  String get welcomeMessage => 'Welcome to ShieldHop';
 }

@@ -97,13 +97,13 @@ abstract class AppLocalizations {
   /// The title of the application
   ///
   /// In en, this message translates to:
-  /// **'Shieldhop'**
+  /// **'ShieldHop'**
   String get appTitle;
 
   /// A welcome message shown to users
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Shieldhop'**
+  /// **'Welcome to ShieldHop'**
   String get welcomeMessage;
 }
 
