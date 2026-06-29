@@ -5,6 +5,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:presshop_enterprise/core/constants/app_colors.dart';
 import 'package:presshop_enterprise/config/routes/app_router.dart';
 import 'package:presshop_enterprise/features/map/core/map_constants.dart';
 import 'package:presshop_enterprise/common/widgets/app_app_bar.dart';
@@ -173,7 +174,7 @@ class _DutiesViewState extends State<_DutiesView> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF2979FF), Color(0xFF0D47A1)],
+          colors: [AppColors.primaryLight, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -505,12 +506,12 @@ class _DutiesViewState extends State<_DutiesView> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8F0FE),
+                        color: AppColors.primaryLightest,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         LucideIcons.building,
-                        color: Color(0xFF1877F2),
+                        color: AppColors.primary,
                         size: 30,
                       ),
                     ),
@@ -550,7 +551,7 @@ class _DutiesViewState extends State<_DutiesView> {
                                 TextSpan(
                                   text: supervisor?.name ?? "—",
                                   style: const TextStyle(
-                                    color: Color(0xFF1877F2),
+                                    color: AppColors.primary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -586,14 +587,14 @@ class _DutiesViewState extends State<_DutiesView> {
                           children: const [
                             Icon(
                               LucideIcons.map_pin,
-                              color: Color(0xFF1877F2),
+                              color: AppColors.primary,
                               size: 20,
                             ),
                             SizedBox(height: 4),
                             Text(
                               "On Map",
                               style: TextStyle(
-                                color: Color(0xFF1877F2),
+                                color: AppColors.primary,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'AirbnbCereal',
@@ -616,12 +617,12 @@ class _DutiesViewState extends State<_DutiesView> {
                       icon: const Icon(
                         LucideIcons.map,
                         size: 16,
-                        color: Color(0xFF1877F2),
+                        color: AppColors.primary,
                       ),
                       label: const Text(
                         "View Map",
                         style: TextStyle(
-                          color: Color(0xFF1877F2),
+                          color: AppColors.primary,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'AirbnbCereal',
@@ -765,7 +766,7 @@ class _DutiesViewState extends State<_DutiesView> {
                           Text(
                             day,
                             style: const TextStyle(
-                              color: Color(0xFF1877F2),
+                              color: AppColors.primary,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'AirbnbCereal',
@@ -826,7 +827,7 @@ class _DutiesViewState extends State<_DutiesView> {
                         Text(
                           timeRange,
                           style: const TextStyle(
-                            color: Color(0xFF1877F2),
+                            color: AppColors.primary,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'AirbnbCereal',
@@ -845,7 +846,7 @@ class _DutiesViewState extends State<_DutiesView> {
                           child: const Text(
                             "Upcoming",
                             style: TextStyle(
-                              color: Color(0xFF1877F2),
+                              color: AppColors.primary,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'AirbnbCereal',
@@ -910,9 +911,9 @@ class _DutiesViewState extends State<_DutiesView> {
                 child: _buildMonthStat(
                   icon: LucideIcons.clock,
                   iconBg: const Color(0xFFEEF2FF),
-                  iconColor: const Color(0xFF1877F2),
+                  iconColor: AppColors.primary,
                   value: totalHours,
-                  valueColor: const Color(0xFF1877F2),
+                  valueColor: AppColors.primary,
                   label: "Total Hours",
                 ),
               ),
@@ -1179,7 +1180,7 @@ class _DutiesViewState extends State<_DutiesView> {
               ),
               child: const Icon(
                 LucideIcons.history,
-                color: Color(0xFF1877F2),
+                color: AppColors.primary,
                 size: 20,
               ),
             ),
