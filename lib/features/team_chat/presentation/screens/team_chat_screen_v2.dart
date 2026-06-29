@@ -324,7 +324,7 @@ class _TeamChatScreenV2State extends State<TeamChatScreenV2> {
     super.initState();
     final prefs = getIt<SharedPreferences>();
     final companyName =
-        prefs.getString('company_name') ?? 'Shieldhop';
+        prefs.getString('company_name') ?? 'ShieldHop';
     _companyLogo = prefs.getString('company_logo');
     _company = _Conversation(
       id: 'company',

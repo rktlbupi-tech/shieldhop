@@ -93,7 +93,7 @@ class LocationPermissionHelper {
                         SizedBox(width: size.width * 0.04),
                         Expanded(
                           child: Text(
-                            'Shieldhop collects location data to enable live shift tracking, mileage calculation, and teammate SOS safety coordination even when the app is closed or not in use.',
+                            'ShieldHop collects location data to enable live shift tracking, mileage calculation, and teammate SOS safety coordination even when the app is closed or not in use.',
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: Colors.black,
                               fontWeight: FontWeight.w500,

@@ -78,7 +78,7 @@ class EmployeeAppBar extends StatelessWidget implements PreferredSizeWidget {
         companyNameOverride ??
         profile?.companyName ??
         prefs.getString('company_name') ??
-        'Shieldhop';
+        'ShieldHop';
     final avatar =
         avatarOverride ??
         profile?.profileImage ??

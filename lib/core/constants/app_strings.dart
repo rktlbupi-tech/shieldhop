@@ -2,7 +2,7 @@ class AppStrings {
   AppStrings._();
 
   // ── App ──────────────────────────────────────────────────
-  static const String appName = 'Shieldhop';
+  static const String appName = 'ShieldHop';
 
   // ── Onboarding ───────────────────────────────────────────
   static const String onboarding1Title = 'Manage Your Team';
@@ -35,11 +35,11 @@ class AppStrings {
   static const String welcomeBack = 'Welcome Back';
   static const String loginSubtitle = 'Sign in to your account';
   static const String createAccount = 'Create Account';
-  static const String signupSubtitle = 'Join Shieldhop';
+  static const String signupSubtitle = 'Join ShieldHop';
 
   // Employee login (carried over from the old app)
   static const String enterpriseLoginTitle =
-      'Welcome to Shieldhop';
+      'Welcome to ShieldHop';
   static const String enterpriseLoginSubtitle =
       'Sign in using your official company email address and the password '
       'shared by your team manager or organisation.';
