@@ -1,0 +1,139 @@
+{
+  "project_info": {
+    "project_number": "750460561502",
+    "firebase_url": "https://presshopdev-db299-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "presshopdev-db299",
+    "storage_bucket": "presshopdev-db299.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750460561502:android:769fcde34607dd0f40accf",
+        "android_client_info": {
+          "package_name": "com.presshop.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750460561502-4lfb1q5681vg8s3aipn119nftgjrmtm0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "66ad9786c8c3bc5e11ccf14ef9bd711ce7e2bc89"
+          }
+        },
+        {
+          "client_id": "750460561502-9mdedg0c3n4r4kpeb3kke4q1nuip998r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "3c8e5da69f6f38c9df60c9bcfd9f59ed1c0234c3"
+          }
+        },
+        {
+          "client_id": "750460561502-b0dq08dojkkjncv27egk8rts5btu6i0f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "9b046e50831b31e8131e1cbc87284d3968651169"
+          }
+        },
+        {
+          "client_id": "750460561502-e745cqo70bb6djvko1id3u4e8a87hqgm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "9794e4bb36c4f438c029c59f8f9d8dd20bc10f97"
+          }
+        },
+        {
+          "client_id": "750460561502-nc6l2h4hsua82h5g7r3votrpgi918qf3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "a4e855a7752c695dd43137988bf3c72d77a8d430"
+          }
+        },
+        {
+          "client_id": "750460561502-oo0ub97q1tpglff654hct7379k3dutuf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "83929f38ad5e8e0a6c4637bf4b67c808a0081fae"
+          }
+        },
+        {
+          "client_id": "750460561502-ouq5fdmesfmrqdra0n3ednfm372ro36t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.presshop.app",
+            "certificate_hash": "c9fa97cd659921d330d60a050e7783a3fff03d30"
+          }
+        },
+        {
+          "client_id": "750460561502-fajfc82s14phu6iu767i7qm53qmu2r8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClF12i0eHy7Nrig6EYu8Z4U5DA2zC09OI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750460561502-65mhhtuet1uqruq7gnh3ir75bu0lf04q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cerebera.shieldhop"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750460561502:android:74a67877c9dcd65440accf",
+        "android_client_info": {
+          "package_name": "com.cerebera.shieldhop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750460561502-fajfc82s14phu6iu767i7qm53qmu2r8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClF12i0eHy7Nrig6EYu8Z4U5DA2zC09OI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750460561502-65mhhtuet1uqruq7gnh3ir75bu0lf04q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cerebera.shieldhop"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

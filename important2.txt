@@ -1,0 +1,218 @@
+# Worker App API — Attendance Capture
+
+This is the API the **worker mobile app (Flutter)** uses to let a worker clock in/out
+and see their own attendance. Everything here is **self-scoped**: the worker is taken
+from the login token, so you never send a worker id.
+
+---
+
+## 1. Basics
+
+**Base URL**
+
+```
+https://dev-api.presshop.news:5019/enterprise
+```
+
+**Auth** — send the worker's login token on every request:
+
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+The worker must be logged in as an **enterprise employee** account. If an admin
+account calls these, it returns `403`.
+
+**Response shape** — every response looks like one of these:
+
+```jsonc
+// success
+{ "success": true, "data": { ... } }
+
+// error
+{ "success": false, "code": "GEOFENCE_OUTSIDE", "message": "You are outside the allowed location", "details": { ... } }
+```
+
+Always read `success` first. On error, show `message` to the user and branch on `code`.
+
+---
+
+## 2. Where does the worker clock in? (geofence in 1 minute)
+
+Each worker has **one posting** — the place they report to. It can be:
+
+| posting `location_kind` | Has a geofence? | Example |
+| --- | --- | --- |
+| `attendance_site` | yes | an office / branch location |
+| `client_site` | yes | a customer's site (e.g. security guard) |
+| `none` | no | field staff who work anywhere |
+
+A **geofence** is just a circle: a center `{lat,lng}` + a `radius_meters`. At clock-in
+the server measures how far the phone's GPS is from that center:
+
+- **inside** the circle → OK.
+- **outside** the circle → depends on `enforcement`:
+  - `hard` → clock-in is **blocked** (`422 GEOFENCE_OUTSIDE`).
+  - `soft` → **allowed**, just flagged for the manager.
+- posting `none` (no circle) → always allowed; we still record GPS.
+
+> **Always send GPS** with a clock-in. Sites with no fence are still recorded.
+
+You get the posting + its geofence + the enforcement mode from **`GET /app/attendance/today`**,
+so you can show the worker where to go and even pre-check the distance before they tap.
+
+---
+
+## 3. Endpoints
+
+### 3.1 GET `/app/attendance/today`
+
+What to show on the home screen: am I clocked in, where's my posting, what's today's session.
+
+**Request:** no body.
+
+**Response:**
+
+```jsonc
+{
+  "success": true,
+  "data": {
+    "status": "present",          // not_clocked_in | present | late | completed
+    "clocked_in": true,
+    "clocked_out": false,
+    "session": {                   // today's session, or null if not started
+      "work_date": "2026-06-23",
+      "clocked_in_at": "2026-06-23T03:31:00.000Z",
+      "clocked_out_at": null,
+      "is_late": false,
+      "worked_ms": 0,
+      "punches": [
+        { "kind": "clock_in", "captured_at": "2026-06-23T03:31:00.000Z", "source": "mobile_self" }
+      ]
+    },
+    "posting": {                   // null if the worker has no active assignment
+      "location_kind": "client_site",
+      "location_id": "665f...",
+      "name": "Lulu Mall - Main Gate",
+      "geofence": { "lat": 26.8467, "lng": 80.9462, "radius_meters": 150 }, // null if no fence
+      "enforcement": "hard"        // hard | soft  (soft when there is no fence)
+    }
+  }
+}
+```
+
+If `posting` is `null` → the worker isn't assigned yet; show "You have no site assigned, contact your manager."
+
+---
+
+### 3.2 POST `/app/attendance/punch`
+
+The single endpoint for **clock in, break start, break end, clock out**.
+
+**Request body:**
+
+```jsonc
+{
+  "kind": "clock_in",            // clock_in | break_start | break_end | clock_out
+  "location": { "lat": 26.8467, "lng": 80.9462, "accuracy_meters": 12 },
+  "photo_url": "https://.../selfie.jpg",  // only if the org requires a photo
+  "captured_at": "2026-06-23T03:31:00.000Z", // optional; server uses now if omitted
+  "device_fingerprint": "abc123"  // optional
+}
+```
+
+- Send `location` on every punch (required unless the org turned GPS off).
+- `photo_url`: upload the selfie first (existing upload API), then pass the URL. Only needed on `clock_in` when the org requires it.
+
+**Success response** (`201`):
+
+```jsonc
+{
+  "success": true,
+  "data": {
+    "session": {
+      "work_date": "2026-06-23",
+      "clocked_in_at": "2026-06-23T03:31:00.000Z",
+      "clocked_out_at": null,
+      "is_late": false,
+      "status": "open",
+      "punches": [ { "kind": "clock_in", "captured_at": "...", "source": "mobile_self" } ]
+    },
+    "geofence_status": "inside"   // inside | outside | na (no fence)
+  }
+}
+```
+
+**Error responses:**
+
+| HTTP | `code` | When | What the app should do |
+| --- | --- | --- | --- |
+| 422 | `GEOFENCE_OUTSIDE` | hard posting + outside the fence | Show "You are X m away from <site>. Move closer to clock in." `details` has `distance_meters` + `radius_meters`. |
+| 400 | `GPS_REQUIRED` | no `location` sent and GPS is required | Ask for location permission / retry. |
+| 400 | `PHOTO_REQUIRED` | clock_in needs a photo | Capture + upload a selfie, then retry. |
+| 409 | `NO_ACTIVE_POSTING` | worker has no assignment | "No site assigned yet." |
+| 403 | `FORBIDDEN` | not a worker account | (shouldn't happen in the worker app) |
+
+> On `soft` enforcement, an outside punch returns `201` with `geofence_status: "outside"` — no error. It's just flagged for the manager.
+
+---
+
+### 3.3 GET `/app/attendance/sessions?days=28`
+
+The worker's own attendance history (most recent first). `days` defaults to 28.
+
+**Response:**
+
+```jsonc
+{
+  "success": true,
+  "data": [
+    {
+      "work_date": "2026-06-23",
+      "clocked_in_at": "2026-06-23T03:31:00.000Z",
+      "clocked_out_at": "2026-06-23T12:02:00.000Z",
+      "worked_ms": 30600000,
+      "ot_ms": 0,
+      "is_late": false,
+      "status": "closed",
+      "punches": [ /* ... */ ]
+    }
+  ]
+}
+```
+
+---
+
+## 4. Happy path the app follows
+
+```
+1. App opens        -> GET /app/attendance/today
+                       show posting + map circle (geofence) + "Clock in" button
+2. Worker taps Clock in
+   - get GPS (and selfie if posting.enforcement/policy needs it)
+   - POST /app/attendance/punch { kind: "clock_in", location, photo_url? }
+   - 201 -> show "Clocked in"; 422 GEOFENCE_OUTSIDE -> show distance + ask to move closer
+3. Break           -> POST /punch { kind: "break_start" } ... { kind: "break_end" }
+4. End of shift    -> POST /punch { kind: "clock_out", location }
+5. History tab     -> GET /app/attendance/sessions?days=28
+```
+
+## 5. Notes for the app
+- Times are **UTC ISO strings** — convert to local for display.
+- `worked_ms` / `ot_ms` are milliseconds.
+- Tip: you can pre-check distance on the device using `posting.geofence` so the worker
+  sees "you're too far" before tapping, but the **server decision is final**.
+- One posting per worker (no site picker needed in v1).
+
+
+
+/////////////
+1. leave management should be there  a page should be 
+2. show monthy everywhere
+3. Payslip have to give year filter and month filter for that year 
+
+1. logoff pop up  - done ( text changes is remaining)
+2. grey border for company profile - done  
+3. submit form not froms 
+4. flip camera - pending 

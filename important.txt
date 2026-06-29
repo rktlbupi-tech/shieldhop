@@ -1,0 +1,128 @@
+
+
+
+
+1. Multiple language have to use  - pending 
+
+
+
+Meeting of 16 June 
+
+1.Other User can report that attandance person is not availble  
+- pending 
+2. dutied record logs histor of prev 1 year filter feature - pending 
+
+
+3. Guard turnout is correct or not ask for video or camera when login  - pending
+
+
+
+Tasks
+Duties
+Attendance & Earnings
+MIleage
+Needs your attention
+
+
+Task -> Tasks
+
+
+Open Camera - Cta Button 
+
+
+
+
+
+
+keytool -genkey -v \
+  -keystore "/Users/rajesh/Documents/PresshopComplete/Presshop+/presshop_enterprise/android/app/presshop_enterprise.jks" \
+  -alias presshop_enterprise \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000 \
+  -storepass "presshop_enterprise_jks" \
+  -keypass "presshop_enterprise_jks" \
+  -dname "CN=Presshop Enterprise, OU=Mobile, O=Presshop, L=Lucknow, S=Uttar Pradesh, C=IN" 2>&1
+
+
+
+
+
+
+1. Remove scan from camera and give a back buttion for apple devices 
+2. Cta buttion api integration in evidence page correct text and color of the cta button 
+3. check why 999 is showing in each plan for emergency  service 
+
+
+
+show  a person image in team chat 
+
+toggle open shoudl open scan camera screen 
+correct back arrow use same desing 
+
+
+
+
+// meeting of 22 june 
+
+1. splash 
+2. onboarding screen 
+
+
+
+Group Team Chat 
+Individual Team Chat
+Task Chat
+
+
+Group Team Chat
+Netfin Entire Team (Default)
+Group Chat Name 1
+Group Chat Name 2
+
+
+
+
+
+Here is a comprehensive architectural compliance audit of all 23 features in lib/features/ compared against the guidelines in docs/architecture.md.
+
+Group 1: Fully Compliant (100% Correct Folder Structure)
+These features perfectly separate concerns into data/, domain/, and presentation/ layers, with logic separated into UseCases, Repositories, and BLoCs.
+
+📁 attendance
+📁 auth (Note: Needs a SignupUseCase instead of direct repository call in BLoC)
+📁 documents
+📁 earnings
+📁 notifications
+📁 profile
+📁 settings
+📁 tasks
+📁 team_chat
+📁 submit_forms
+📁 sos
+Group 2: Partially Compliant (Missing Domain Layer)
+These features have standard data/ and presentation/ layers, but they bypass the domain/ layer (no usecases or separate entities). The repository implementation or BLoC directly handles domain/business logic.
+
+📁 camera (data/, presentation/, utils/)
+📁 content (data/, presentation/)
+📁 duties (data/, presentation/)
+📁 splash (data/, presentation/)
+📁 map (core/, data/, presentation/)
+
+//////////////////
+
+Group 3: Architecture Violators (Direct API Calls in UI Layer)
+None (All violations successfully refactored and moved to Group 1).
+
+Group 4: UI-Only Features (Clean Presentation-Only)
+These features consist only of a presentation/ layer. However, they do not perform any network operations or possess complex business logic (they delegate actions or simply act as static UI shells/drawers). Therefore, their simple folder structure is acceptable.
+
+
+//////////
+
+📁 dashboard (Hosts main bottom bar shell)
+📁 menu (Hosts drawer menu navigation items)
+📁 mileage (Static forms, actions handled via map or other workflows)
+📁 onboarding (Onboarding intro carousel page)
+📁 payslip (Simple payslip layout view)
+📁 others (Obsolete folder; unused)
