@@ -482,12 +482,11 @@ class _TeamChatListPageState extends State<TeamChatListPage> {
       lastMessageAt = item.conversation.lastMessageAt;
     } else {
       String mediaHouse =
-          _sharedPreferences?.getString(employeeMediaHouseNameKey) ??
+          _sharedPreferences.getString(employeeMediaHouseNameKey) ??
           "Times of India";
       title = "$mediaHouse Team chat";
       subtitle = "Important: Please upload your field evidence.";
-      avatarUrl =
-          _sharedPreferences?.getString(employeeMediaHouseLogoKey) ?? "";
+      avatarUrl = _sharedPreferences.getString(employeeMediaHouseLogoKey) ?? "";
       taskId = "";
     }
 
@@ -502,16 +501,18 @@ class _TeamChatListPageState extends State<TeamChatListPage> {
               vertical: 0,
             ),
             onTap: () {
-              context.push(
-                AppRoutes.teamChatMessage,
-                extra: {
-                  'conversationId': taskId,
-                  'title': title,
-                  'image': avatarUrl,
-                },
-              ).then((_) {
-                _controller.fetchConversations(refresh: true);
-              });
+              context
+                  .push(
+                    AppRoutes.teamChatMessage,
+                    extra: {
+                      'conversationId': taskId,
+                      'title': title,
+                      'image': avatarUrl,
+                    },
+                  )
+                  .then((_) {
+                    _controller.fetchConversations(refresh: true);
+                  });
             },
             leading: Container(
               height: responsiveWidth * 0.115,
@@ -631,16 +632,18 @@ class _TeamChatListPageState extends State<TeamChatListPage> {
               vertical: 0,
             ),
             onTap: () {
-              context.push(
-                AppRoutes.teamChatMessage,
-                extra: {
-                  'conversationId': item.conversation.id,
-                  'title': item.display.title,
-                  'image': item.display.avatarImage,
-                },
-              ).then((_) {
-                _controller.fetchConversations(refresh: true);
-              });
+              context
+                  .push(
+                    AppRoutes.teamChatMessage,
+                    extra: {
+                      'conversationId': item.conversation.id,
+                      'title': item.display.title,
+                      'image': item.display.avatarImage,
+                    },
+                  )
+                  .then((_) {
+                    _controller.fetchConversations(refresh: true);
+                  });
             },
             leading: Container(
               height: responsiveWidth * 0.115,

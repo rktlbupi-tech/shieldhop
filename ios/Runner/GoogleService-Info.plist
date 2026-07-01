@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5.apps.googleusercontent.com</string>
+	<string>750460561502-prc5bj6cs90pkbto1fouh4s79n21rmi3.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5</string>
+	<string>com.googleusercontent.apps.750460561502-prc5bj6cs90pkbto1fouh4s79n21rmi3</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>750460561502-423u5q1pfiav3ud486ojlvl3rrt76fvh.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:750460561502:ios:5e81b3ce95cbee9240accf</string>
+	<string>1:750460561502:ios:3931d08d07f114d240accf</string>
 	<key>DATABASE_URL</key>
 	<string>https://presshopdev-db299-default-rtdb.asia-southeast1.firebasedatabase.app</string>
 </dict>

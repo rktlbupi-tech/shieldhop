@@ -29,12 +29,7 @@ import '../../../../common/widgets/loading_widget.dart';
 class TaskChatScreen extends StatefulWidget {
   final EmployeeTaskModel? taskDetail;
   final String roomId;
-
-  /// When opened from the team-chat list we already know the conversation id,
-  /// so the task→conversation lookup can be skipped.
   final String? conversationId;
-
-  /// Optional header title (used for team-chat conversations).
   final String? title;
 
   const TaskChatScreen({
@@ -128,6 +123,13 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
     }
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(diff.inHours)}:${two(diff.inMinutes % 60)}:${two(diff.inSeconds % 60)}';
+  }
+
+  /// Voice-note timer as `m:ss` (e.g. 0:09, 1:23) — no leading hours segment.
+  String _formatRecordDuration(int seconds) {
+    final m = seconds ~/ 60;
+    final s = (seconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   String _deadlineLabel() {
@@ -380,6 +382,25 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
       });
     } catch (e) {
       _showSnack("Microphone is currently busy or in use by another app.");
+    }
+  }
+
+  /// Stops recording and discards the captured file without sending.
+  Future<void> _cancelRecording() async {
+    _recordTimer?.cancel();
+    try {
+      final path = await _audioRecorder.stop();
+      if (path != null) {
+        try {
+          File(path).deleteSync();
+        } catch (_) {}
+      }
+    } catch (_) {}
+    if (mounted) {
+      setState(() {
+        _isRecording = false;
+        _recordDuration = 0;
+      });
     }
   }
 
@@ -1045,16 +1066,27 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(size.width * 0.04),
-              child: Image.network(
-                url,
-                width: size.width * 0.64,
-                fit: BoxFit.cover,
-                errorBuilder: (_, e, s) => const Icon(
-                  Icons.broken_image,
-                  size: 40,
-                  color: Colors.grey,
-                ),
-              ),
+              child: url.isEmpty
+                  ? Container(
+                      width: size.width * 0.64,
+                      height: size.width * 0.4,
+                      color: Colors.grey.shade100,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    )
+                  : Image.network(
+                      url,
+                      width: size.width * 0.64,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, e, s) => const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 8),
@@ -1221,7 +1253,9 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
                   ? const SizedBox(
                       width: 44,
                       height: 44,
-                      child: LoadingWidget(size: 20),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2.0),
+                      ),
                     )
                   : _inputIconButton(
                       icon: LucideIcons.plus,
@@ -1292,10 +1326,10 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
                     if (_isRecording)
                       Positioned.fill(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF5F6F8),
-                            borderRadius: BorderRadius.circular(22),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: const Color(0xFFE2E8F0),
                               width: 1.0,
@@ -1361,10 +1395,7 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.transparent,
-          border: Border.all(
-            color: const Color(0xFF1677FF).withValues(alpha: 0.45),
-            width: 1.5,
-          ),
+          border: Border.all(color: AppColors.primary, width: 1.5),
         ),
         child: Center(
           child: Container(
@@ -1372,7 +1403,7 @@ class _TaskChatScreenState extends State<TaskChatScreen> {
             height: 35,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF1677FF),
+              color: AppColors.primary,
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.18),
                 width: 1,
@@ -1639,7 +1670,7 @@ class _AudioBubbleState extends State<_AudioBubble> {
                     'Voice note',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey,
+                      color: Color.fromARGB(0, 158, 158, 158),
                       fontFamily: 'AirbnbCereal',
                     ),
                   ),

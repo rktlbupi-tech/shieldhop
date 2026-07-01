@@ -280,7 +280,7 @@ class _AlertPanelEmployeeState extends State<AlertPanelEmployee> {
                                   Icon(
                                     Icons.phone,
                                     size: w * 0.04,
-                                    color: AppColors.primary,
+                                    color: AppColors.error,
                                   ),
                                   SizedBox(width: w * 0.02),
                                   Text(
@@ -288,7 +288,7 @@ class _AlertPanelEmployeeState extends State<AlertPanelEmployee> {
                                     style: TextStyle(
                                       fontSize: w * 0.032,
                                       fontWeight: FontWeight.w500,
-                                      color: AppColors.primary,
+                                      color: AppColors.error,
                                       fontFamily: 'AirbnbCereal',
                                     ),
                                   ),

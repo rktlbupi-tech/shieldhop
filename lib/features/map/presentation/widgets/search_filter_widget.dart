@@ -2,17 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:presshop_enterprise/core/constants/app_colors.dart';
 import 'package:presshop_enterprise/features/map/core/map_constants.dart';
-import 'package:presshop_enterprise/features/map/core/map_constants.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:presshop_enterprise/features/map/core/map_constants.dart';
-import 'package:presshop_enterprise/features/map/core/map_constants.dart';
 
 final List<FilterOption> employeeAlertOptions = [
   const FilterOption(label: 'Alerts', value: ''),
-  ...alertOptions.map(
-    (e) => FilterOption(label: e.label ?? '', value: e.value ?? ''),
-  ),
+  ...alertOptions.map((e) => FilterOption(label: e.label, value: e.value)),
 ];
 
 class SearchAndFilterBar extends StatelessWidget {
@@ -65,7 +58,7 @@ class SearchAndFilterBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 3,
-                    vertical: 2,
+                    vertical: 1,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,

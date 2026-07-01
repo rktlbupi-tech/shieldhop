@@ -52,20 +52,21 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyClF12i0eHy7Nrig6EYu8Z4U5DA2zC09OI',
-    appId: '1:750460561502:android:74a67877c9dcd65440accf',
+    appId: '1:750460561502:android:b35dfbf38c85860640accf',
     messagingSenderId: '750460561502',
     projectId: 'presshopdev-db299',
-    databaseURL: 'https://presshopdev-db299-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://presshopdev-db299-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'presshopdev-db299.appspot.com',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAIaPQyvLdlGaTG-AgFe0rzAlAkGK-JIJI',
-    appId: '1:750460561502:ios:97c4a5d898f9349140accf',
+    apiKey: 'AIzaSyCH4hX4blHjHrCTdwt7dF04tg0sWH8cVUk',
+    appId: '1:750460561502:ios:3931d08d07f114d240accf',
     messagingSenderId: '750460561502',
     projectId: 'presshopdev-db299',
     storageBucket: 'presshopdev-db299.appspot.com',
     iosClientId:
-        '750460561502-geuno4tt1ic52cor9l2obl1vhuogvsp0.apps.googleusercontent.com',
-    iosBundleId: 'com.presshop.app',
+        '750460561502-prc5bj6cs90pkbto1fouh4s79n21rmi3.apps.googleusercontent.com',
+    iosBundleId: 'com.cerebera.shieldhop',
   );
 }

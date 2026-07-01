@@ -43,7 +43,7 @@ android {
         applicationId = "com.cerebera.shieldhop"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = 6
+        versionCode = 1
         versionName = "1.0.0"
     }
 

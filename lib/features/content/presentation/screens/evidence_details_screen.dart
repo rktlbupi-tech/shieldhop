@@ -676,7 +676,7 @@ class _EvidenceDetailsScreenState extends State<EvidenceDetailsScreen> {
             position: _currentMediaIndex,
             decorator: const DotsDecorator(
               color: Colors.grey,
-              activeColor: Colors.redAccent,
+              activeColor: AppColors.primaryLight,
             ),
           ),
         ],

@@ -19,10 +19,7 @@ class TrackMileageScreen extends StatelessWidget {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     return BlocProvider(
       create: (_) => getIt<MileageBloc>()
-        ..add(FetchMileageOverview(
-          period: MileagePeriod.monthly,
-          date: today,
-        )),
+        ..add(FetchMileageOverview(period: MileagePeriod.monthly, date: today)),
       child: const _TrackMileageView(),
     );
   }
@@ -46,9 +43,9 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
 
   String get _dateStr => DateFormat('yyyy-MM-dd').format(_currentDate);
 
-  void _reload() => context
-      .read<MileageBloc>()
-      .add(FetchMileageOverview(period: _period, date: _dateStr));
+  void _reload() => context.read<MileageBloc>().add(
+    FetchMileageOverview(period: _period, date: _dateStr),
+  );
 
   void _changeDay(bool next) {
     setState(() {
@@ -105,7 +102,8 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
     return '$sym${amount.toStringAsFixed(2)}';
   }
 
-  String _clock(DateTime? d) => d == null ? '' : DateFormat('hh:mm a').format(d.toLocal());
+  String _clock(DateTime? d) =>
+      d == null ? '' : DateFormat('hh:mm a').format(d.toLocal());
 
   @override
   Widget build(BuildContext context) {
@@ -119,19 +117,7 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
         titleSpacing: 0,
         showBack: true,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showLogDialog,
-        backgroundColor: AppColors.primary,
-        icon: const Icon(LucideIcons.plus, color: Colors.white),
-        label: const Text(
-          'Log mileage',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'AirbnbCereal',
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+
       body: SafeArea(
         child: BlocConsumer<MileageBloc, MileageState>(
           listenWhen: (p, c) =>
@@ -170,10 +156,11 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
     final summary = loaded.summary;
     final trips = loaded.trips;
     final unit = summary?.unit ?? 'km';
-    final currency = summary?.currency ??
-        (trips.isNotEmpty ? trips.first.currency : 'GBP');
-    final selIndex =
-        trips.isEmpty ? 0 : _selectedTripIndex.clamp(0, trips.length - 1);
+    final currency =
+        summary?.currency ?? (trips.isNotEmpty ? trips.first.currency : 'GBP');
+    final selIndex = trips.isEmpty
+        ? 0
+        : _selectedTripIndex.clamp(0, trips.length - 1);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
@@ -195,8 +182,9 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                       color: isSelected
                           ? AppColors.primary
                           : const Color(0xFF6B7280),
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                   selected: isSelected,
@@ -237,7 +225,11 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
               onTap: _pickDate,
               child: Row(
                 children: [
-                  const Icon(LucideIcons.calendar, size: 16, color: Colors.grey),
+                  const Icon(
+                    LucideIcons.calendar,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     DateFormat('dd MMM yyyy, EEEE').format(_currentDate),
@@ -249,8 +241,11 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down,
-                      size: 16, color: Colors.grey),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
                 ],
               ),
             ),
@@ -272,7 +267,9 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                 _distanceStr(summary?.totalDistanceMeters ?? 0, unit),
                 delta: summary?.distanceDeltaMeters ?? 0,
                 deltaText: _distanceStr(
-                    (summary?.distanceDeltaMeters ?? 0).abs(), unit),
+                  (summary?.distanceDeltaMeters ?? 0).abs(),
+                  unit,
+                ),
                 icon: LucideIcons.milestone,
                 color: Colors.blue,
               ),
@@ -306,8 +303,10 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                 "Est. Fuel Cost",
                 _money(summary?.estFuelCost ?? 0, currency),
                 delta: summary?.estFuelCostDelta ?? 0,
-                deltaText:
-                    _money((summary?.estFuelCostDelta ?? 0).abs(), currency),
+                deltaText: _money(
+                  (summary?.estFuelCostDelta ?? 0).abs(),
+                  currency,
+                ),
                 icon: LucideIcons.fuel,
                 color: Colors.orange,
               ),
@@ -375,8 +374,11 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(LucideIcons.shield_check,
-                  size: 16, color: AppColors.primary),
+              Icon(
+                LucideIcons.shield_check,
+                size: 16,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 10),
               const Expanded(
                 child: Text(
@@ -400,8 +402,8 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
     final title = (trip.startLabel != null && trip.endLabel != null)
         ? '${trip.startLabel} → ${trip.endLabel}'
         : (trip.date != null
-            ? DateFormat('dd MMM yyyy').format(trip.date!)
-            : 'Selected day');
+              ? DateFormat('dd MMM yyyy').format(trip.date!)
+              : 'Selected day');
     return Container(
       height: 180,
       decoration: BoxDecoration(
@@ -413,8 +415,10 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
       child: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition:
-                const CameraPosition(target: _defaultCenter, zoom: 11),
+            initialCameraPosition: const CameraPosition(
+              target: _defaultCenter,
+              zoom: 11,
+            ),
             zoomControlsEnabled: false,
             myLocationButtonEnabled: false,
             liteModeEnabled: true,
@@ -424,8 +428,7 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
             right: 8,
             top: 8,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(8),
@@ -457,8 +460,8 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
     final title = (trip.startLabel != null && trip.endLabel != null)
         ? '${trip.startLabel} to ${trip.endLabel}'
         : (trip.date != null
-            ? DateFormat('EEE, dd MMM yyyy').format(trip.date!)
-            : 'Day record');
+              ? DateFormat('EEE, dd MMM yyyy').format(trip.date!)
+              : 'Day record');
     final clockLine = (trip.clockInAt != null && trip.clockOutAt != null)
         ? '${_clock(trip.clockInAt)} – ${_clock(trip.clockOutAt)}'
         : (trip.source == 'manual' ? 'Manual entry' : 'GPS');
@@ -485,8 +488,7 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color:
-                      isSelected ? AppColors.primary : Colors.grey.shade100,
+                  color: isSelected ? AppColors.primary : Colors.grey.shade100,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -495,8 +497,7 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                   style: TextStyle(
                     fontFamily: 'AirbnbCereal',
                     fontSize: 12,
-                    color:
-                        isSelected ? Colors.white : const Color(0xFF6B7280),
+                    color: isSelected ? Colors.white : const Color(0xFF6B7280),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -682,21 +683,22 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
     final odoEndCtrl = TextEditingController();
 
     InputDecoration dec(String hint) => InputDecoration(
-          hintText: hint,
-          isDense: true,
-          hintStyle: TextStyle(
-              fontFamily: 'AirbnbCereal', color: Colors.grey.shade400, fontSize: 13),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        );
+      hintText: hint,
+      isDense: true,
+      hintStyle: TextStyle(
+        fontFamily: 'AirbnbCereal',
+        color: Colors.grey.shade400,
+        fontSize: 13,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    );
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Log mileage · ${DateFormat('dd MMM').format(_currentDate)}',
           style: const TextStyle(
@@ -710,16 +712,20 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Distance ($unit)',
-                  style: const TextStyle(
-                      fontFamily: 'AirbnbCereal',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              Text(
+                'Distance ($unit)',
+                style: const TextStyle(
+                  fontFamily: 'AirbnbCereal',
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 6),
               TextField(
                 controller: distanceCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: dec('e.g. 24.6'),
               ),
               const SizedBox(height: 12),
@@ -729,15 +735,24 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                 decoration: dec('Duration (minutes)'),
               ),
               const SizedBox(height: 12),
-              TextField(controller: startCtrl, decoration: dec('Start label (optional)')),
+              TextField(
+                controller: startCtrl,
+                decoration: dec('Start label (optional)'),
+              ),
               const SizedBox(height: 12),
-              TextField(controller: endCtrl, decoration: dec('End label (optional)')),
+              TextField(
+                controller: endCtrl,
+                decoration: dec('End label (optional)'),
+              ),
               const Divider(height: 28),
-              const Text('Or manual odometer (km)',
-                  style: TextStyle(
-                      fontFamily: 'AirbnbCereal',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              const Text(
+                'Or manual odometer (km)',
+                style: TextStyle(
+                  fontFamily: 'AirbnbCereal',
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 6),
               Row(
                 children: [
@@ -764,9 +779,10 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel',
-                style: TextStyle(
-                    fontFamily: 'AirbnbCereal', color: Colors.grey)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(fontFamily: 'AirbnbCereal', color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
@@ -787,24 +803,29 @@ class _TrackMileageViewState extends State<_TrackMileageView> {
                 return;
               }
 
-              bloc.add(LogMileageDay(
-                date: _dateStr,
-                distanceMeters: hasDistance
-                    ? dist * (unit == 'mi' ? 1609.344 : 1000.0)
-                    : null,
-                odometerStart: hasDistance ? null : odoS,
-                odometerEnd: hasDistance ? null : odoE,
-                durationMinutes: dur,
-                startLabel: startCtrl.text.trim(),
-                endLabel: endCtrl.text.trim(),
-              ));
+              bloc.add(
+                LogMileageDay(
+                  date: _dateStr,
+                  distanceMeters: hasDistance
+                      ? dist * (unit == 'mi' ? 1609.344 : 1000.0)
+                      : null,
+                  odometerStart: hasDistance ? null : odoS,
+                  odometerEnd: hasDistance ? null : odoE,
+                  durationMinutes: dur,
+                  startLabel: startCtrl.text.trim(),
+                  endLabel: endCtrl.text.trim(),
+                ),
+              );
               Navigator.pop(ctx);
             },
-            child: const Text('Save',
-                style: TextStyle(
-                    fontFamily: 'AirbnbCereal',
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Save',
+              style: TextStyle(
+                fontFamily: 'AirbnbCereal',
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

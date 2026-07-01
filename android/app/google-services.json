@@ -8,6 +8,42 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:750460561502:android:b35dfbf38c85860640accf",
+        "android_client_info": {
+          "package_name": "com.cerebera.shieldhop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "750460561502-fajfc82s14phu6iu767i7qm53qmu2r8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClF12i0eHy7Nrig6EYu8Z4U5DA2zC09OI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "750460561502-65mhhtuet1uqruq7gnh3ir75bu0lf04q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.presshop.enterprise"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:750460561502:android:769fcde34607dd0f40accf",
         "android_client_info": {
           "package_name": "com.presshop.app"
@@ -91,7 +127,7 @@
               "client_id": "750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.cerebera.shieldhop"
+                "bundle_id": "com.presshop.enterprise"
               }
             }
           ]
@@ -102,7 +138,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:750460561502:android:74a67877c9dcd65440accf",
         "android_client_info": {
-          "package_name": "com.cerebera.shieldhop"
+          "package_name": "com.presshop.enterprise"
         }
       },
       "oauth_client": [
@@ -127,7 +163,7 @@
               "client_id": "750460561502-ctskqop93qlnnp7m74fout2ejutsl2f5.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.cerebera.shieldhop"
+                "bundle_id": "com.presshop.enterprise"
               }
             }
           ]

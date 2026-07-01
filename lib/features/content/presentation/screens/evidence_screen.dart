@@ -718,7 +718,7 @@ class _EvidenceScreenState extends State<EvidenceScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: AppColors.textFieldBorder,
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Center(

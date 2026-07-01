@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:presshop_enterprise/core/constants/app_colors.dart';
 import 'package:presshop_enterprise/features/map/core/map_constants.dart';
-
 
 class MessageButtonForMap extends StatelessWidget {
   const MessageButtonForMap({super.key});
@@ -10,7 +9,6 @@ class MessageButtonForMap extends StatelessWidget {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final double responsiveWidth = size.width > 600 ? 650 : size.width;
-    
 
     return Container(
       decoration: BoxDecoration(
@@ -44,9 +42,7 @@ class MessageButtonForMap extends StatelessWidget {
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: true
-                  ? colorEmployeeGreen1
-                  : colorThemePink,
+              color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(size100),
               boxShadow: [
                 BoxShadow(

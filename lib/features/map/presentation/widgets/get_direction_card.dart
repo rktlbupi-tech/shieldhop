@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:presshop_enterprise/core/constants/app_colors.dart';
 import 'package:presshop_enterprise/features/map/core/map_constants.dart';
 import 'package:presshop_enterprise/features/map/presentation/bloc/map_cubit.dart';
 import 'package:presshop_enterprise/common/widgets/loading_widget.dart';
@@ -28,7 +29,7 @@ class _GetDirectionCardState extends State<GetDirectionCard> {
   bool _isLoading = false;
   LatLng? _selectedOrigin;
   LatLng? _selectedDestination;
-  LatLng? _lastProcessedMapLocation;
+  // LatLng? _lastProcessedMapLocation;
   @override
   void initState() {
     super.initState();
@@ -189,61 +190,61 @@ class _GetDirectionCardState extends State<GetDirectionCard> {
   }
   // when content window open then emit socket and recieved to show view on content window
 
-  Future<void> _useCurrentLocation() async {
-    final state = context.read<MapCubit>().state;
-    if (state.myLocation != null) {
-      setState(() {
-        _currentLocationController.text =
-            state.myLocationAddress ?? 'Current Location';
-        _selectedOrigin = state.myLocation; // Ensure precise lat/lng
-        _currentLocationFocusNode.unfocus();
-      });
+  // Future<void> _useCurrentLocation() async {
+  //   final state = context.read<MapCubit>().state;
+  //   if (state.myLocation != null) {
+  //     setState(() {
+  //       _currentLocationController.text =
+  //           state.myLocationAddress ?? 'Current Location';
+  //       _selectedOrigin = state.myLocation; // Ensure precise lat/lng
+  //       _currentLocationFocusNode.unfocus();
+  //     });
 
-      if (_selectedDestination != null) {
-        await _getRoute(_selectedOrigin, _selectedDestination!);
-      }
-    }
-  }
+  //     if (_selectedDestination != null) {
+  //       await _getRoute(_selectedOrigin, _selectedDestination!);
+  //     }
+  //   }
+  // }
 
-  void _handleMapSelectedLocation() {
-    final state = context.read<MapCubit>().state;
+  // void _handleMapSelectedLocation() {
+  //   final state = context.read<MapCubit>().state;
 
-    if (state.mapSelectedLocation != null &&
-        state.mapSelectedAddress != null &&
-        state.mapSelectedIsOrigin != null &&
-        state.mapSelectedLocation != _lastProcessedMapLocation) {
-      final mapController = context.read<MapCubit>();
+  //   if (state.mapSelectedLocation != null &&
+  //       state.mapSelectedAddress != null &&
+  //       state.mapSelectedIsOrigin != null &&
+  //       state.mapSelectedLocation != _lastProcessedMapLocation) {
+  //     final mapController = context.read<MapCubit>();
 
-      // Mark as processed
-      _lastProcessedMapLocation = state.mapSelectedLocation;
+  //     // Mark as processed
+  //     _lastProcessedMapLocation = state.mapSelectedLocation;
 
-      if (state.mapSelectedIsOrigin == true) {
-        setState(() {
-          _currentLocationController.text = state.mapSelectedAddress!;
-          _selectedOrigin = state.mapSelectedLocation;
-        });
-      } else {
-        setState(() {
-          _destinationController.text = state.mapSelectedAddress!;
-          _selectedDestination = state.mapSelectedLocation;
-        });
-      }
+  //     if (state.mapSelectedIsOrigin == true) {
+  //       setState(() {
+  //         _currentLocationController.text = state.mapSelectedAddress!;
+  //         _selectedOrigin = state.mapSelectedLocation;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         _destinationController.text = state.mapSelectedAddress!;
+  //         _selectedDestination = state.mapSelectedLocation;
+  //       });
+  //     }
 
-      mapController.clearMapSelectedLocation();
+  //     mapController.clearMapSelectedLocation();
 
-      if (!_isLoading) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted && !_isLoading) {
-            if (_selectedOrigin != null && _selectedDestination != null) {
-              _getRoute(_selectedOrigin, _selectedDestination!);
-            } else if (_selectedDestination != null) {
-              _getRoute(_selectedOrigin, _selectedDestination!);
-            }
-          }
-        });
-      }
-    }
-  }
+  //     if (!_isLoading) {
+  //       Future.delayed(const Duration(milliseconds: 300), () {
+  //         if (mounted && !_isLoading) {
+  //           if (_selectedOrigin != null && _selectedDestination != null) {
+  //             _getRoute(_selectedOrigin, _selectedDestination!);
+  //           } else if (_selectedDestination != null) {
+  //             _getRoute(_selectedOrigin, _selectedDestination!);
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   final LayerLink _originLayerLink = LayerLink();
   final LayerLink _destinationLayerLink = LayerLink();
@@ -318,7 +319,7 @@ class _GetDirectionCardState extends State<GetDirectionCard> {
                         Icon(
                           Icons.my_location,
                           size: responsiveWidth * numD045,
-                          color: Colors.redAccent,
+                          color: AppColors.primary,
                         ),
                         SizedBox(height: responsiveWidth * numD02),
                         dottedLine(responsiveWidth),
@@ -461,7 +462,7 @@ class _GetDirectionCardState extends State<GetDirectionCard> {
                           },
                     style: ElevatedButton.styleFrom(
                       elevation: 0.0,
-                      backgroundColor: Colors.redAccent,
+                      backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           responsiveWidth * numD02,

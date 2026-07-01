@@ -106,8 +106,9 @@ class _HomeScreen3State extends State<HomeScreen3> {
     super.dispose();
   }
 
-  String _num(num v) =>
-      v == v.toDouble().roundToDouble() ? v.toInt().toString() : v.toStringAsFixed(1);
+  String _num(num v) => v == v.toDouble().roundToDouble()
+      ? v.toInt().toString()
+      : v.toStringAsFixed(1);
 
   String _hm(int minutes) {
     final h = minutes ~/ 60;
@@ -121,14 +122,14 @@ class _HomeScreen3State extends State<HomeScreen3> {
         return (
           label: 'Completed',
           color: const Color(0xFF127A45),
-          bg: const Color(0xFFEAF5EE)
+          bg: const Color(0xFFEAF5EE),
         );
       case 'in_progress':
       case 'accepted':
         return (
           label: 'In Progress',
           color: AppColors.primary,
-          bg: AppColors.primaryLightest
+          bg: AppColors.primaryLightest,
         );
       default:
         return (
@@ -136,7 +137,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
               ? 'Pending'
               : status[0].toUpperCase() + status.substring(1),
           color: const Color(0xFF9A6411),
-          bg: const Color(0xFFFDF3E2)
+          bg: const Color(0xFFFDF3E2),
         );
     }
   }
@@ -153,129 +154,133 @@ class _HomeScreen3State extends State<HomeScreen3> {
             },
           ),
           BlocListener<AttendanceBloc, AttendanceState>(
-          listener: (context, state) {
-            if (state is AttendanceActionSuccess) {
-              if (state.isCheckedIn) {
-                final now = DateTime.now();
-                _saveCheckInTime(now);
-                setState(() => _activateDutyTimer(now));
-              } else {
-                _clearCheckInTime();
-                setState(() => _deactivateDutyTimer());
+            listener: (context, state) {
+              if (state is AttendanceActionSuccess) {
+                if (state.isCheckedIn) {
+                  final now = DateTime.now();
+                  _saveCheckInTime(now);
+                  setState(() => _activateDutyTimer(now));
+                } else {
+                  _clearCheckInTime();
+                  setState(() => _deactivateDutyTimer());
+                }
+                context.read<AttendanceBloc>().add(const FetchAttendanceLog());
+              } else if (state is AttendanceLoaded) {
+                if (state.isCheckedIn && _localCheckInTime == null) {
+                  final logTime = state.logs.isNotEmpty
+                      ? state.logs.first.checkIn
+                      : null;
+                  final checkInTime = logTime ?? DateTime.now();
+                  _saveCheckInTime(checkInTime);
+                  setState(() => _activateDutyTimer(checkInTime));
+                } else if (!state.isCheckedIn && _localCheckInTime != null) {
+                  _clearCheckInTime();
+                  setState(() => _deactivateDutyTimer());
+                }
+              } else if (state is AttendanceError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: AppColors.error,
+                    content: Text(state.message),
+                  ),
+                );
               }
-              context.read<AttendanceBloc>().add(const FetchAttendanceLog());
-            } else if (state is AttendanceLoaded) {
-              if (state.isCheckedIn && _localCheckInTime == null) {
-                final logTime = state.logs.isNotEmpty
-                    ? state.logs.first.checkIn
-                    : null;
-                final checkInTime = logTime ?? DateTime.now();
-                _saveCheckInTime(checkInTime);
-                setState(() => _activateDutyTimer(checkInTime));
-              } else if (!state.isCheckedIn && _localCheckInTime != null) {
-                _clearCheckInTime();
-                setState(() => _deactivateDutyTimer());
-              }
-            } else if (state is AttendanceError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: AppColors.error,
-                  content: Text(state.message),
-                ),
-              );
-            }
+            },
+          ),
+        ],
+        child: BlocBuilder<ProfileBloc, ProfileState>(
+          builder: (context, profileState) {
+            final profile = profileState is ProfileLoaded
+                ? profileState.profile
+                : null;
+            return BlocBuilder<AttendanceBloc, AttendanceState>(
+              builder: (context, attendanceState) {
+                final isCheckedIn = attendanceState is AttendanceLoaded
+                    ? attendanceState.isCheckedIn
+                    : false;
+                final logs = attendanceState is AttendanceLoaded
+                    ? attendanceState.logs
+                    : [];
+                final latestLog = logs.isNotEmpty ? logs.first : null;
+
+                final checkInTimeStr = isCheckedIn
+                    ? DateFormat('hh:mm a').format(
+                        _localCheckInTime ??
+                            latestLog?.checkIn ??
+                            DateTime.now(),
+                      )
+                    : '09:03 AM';
+                final siteStr = _home?.duty.site?.isNotEmpty == true
+                    ? _home!.duty.site!
+                    : (profile?.currentLocation?.isNotEmpty == true
+                          ? profile!.currentLocation!
+                          : 'MG Road, Bengaluru');
+                final mileageStr = _formatDistance(
+                  _home?.duty.mileageToday ?? 0.0,
+                );
+
+                return Scaffold(
+                  backgroundColor: const Color(0xFFF2F4F8),
+                  appBar: EmployeeAppBar(
+                    onProfileTap: () => _navigateToTab(4),
+                    isOnline: isCheckedIn,
+                  ),
+                  body: RefreshIndicator(
+                    color: AppColors.primary,
+                    onRefresh: () async {
+                      _homeBloc.add(const FetchHome());
+                      context.read<AttendanceBloc>().add(
+                        const FetchAttendanceLog(),
+                      );
+                      await Future<void>.delayed(
+                        const Duration(milliseconds: 600),
+                      );
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      padding: EdgeInsets.only(
+                        left: 16.w,
+                        right: 16.w,
+                        top: 16.h,
+                        bottom: 96.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDutyCard(
+                            isCheckedIn,
+                            checkInTimeStr,
+                            siteStr,
+                            mileageStr,
+                          ),
+                          SizedBox(height: 16.h),
+                          _buildCameraShortcutCard(),
+                          // SizedBox(height: 6.h),
+                          _buildTasksCard(),
+                          SizedBox(height: 16.h),
+                          _buildDutiesCard(),
+                          SizedBox(height: 16.h),
+                          // _buildStatsGrid(),
+                          // SizedBox(height: 16.h),
+                          _buildRecentAttendanceCard(),
+                          SizedBox(height: 16.h),
+                          _buildRecentEarningsCard(),
+                          SizedBox(height: 16.h),
+                          _buildRecentMileageCard(),
+                          SizedBox(height: 16.h),
+                          _buildAttentionSection(),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
           },
         ),
-      ],
-      child: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, profileState) {
-          final profile = profileState is ProfileLoaded
-              ? profileState.profile
-              : null;
-          return BlocBuilder<AttendanceBloc, AttendanceState>(
-            builder: (context, attendanceState) {
-              final isCheckedIn = attendanceState is AttendanceLoaded
-                  ? attendanceState.isCheckedIn
-                  : false;
-              final logs = attendanceState is AttendanceLoaded
-                  ? attendanceState.logs
-                  : [];
-              final latestLog = logs.isNotEmpty ? logs.first : null;
-
-              final checkInTimeStr = isCheckedIn
-                  ? DateFormat('hh:mm a').format(
-                      _localCheckInTime ?? latestLog?.checkIn ?? DateTime.now(),
-                    )
-                  : '09:03 AM';
-              final siteStr = _home?.duty.site?.isNotEmpty == true
-                  ? _home!.duty.site!
-                  : (profile?.currentLocation?.isNotEmpty == true
-                      ? profile!.currentLocation!
-                      : 'MG Road, Bengaluru');
-              final mileageStr =
-                  _formatDistance(_home?.duty.mileageToday ?? 0.0);
-
-              return Scaffold(
-                backgroundColor: const Color(0xFFF2F4F8),
-                appBar: EmployeeAppBar(
-                  onProfileTap: () => _navigateToTab(4),
-                  isOnline: isCheckedIn,
-                ),
-                body: RefreshIndicator(
-                  color: AppColors.primary,
-                  onRefresh: () async {
-                    _homeBloc.add(const FetchHome());
-                    context
-                        .read<AttendanceBloc>()
-                        .add(const FetchAttendanceLog());
-                    await Future<void>.delayed(
-                        const Duration(milliseconds: 600));
-                  },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    padding: EdgeInsets.only(
-                      left: 16.w,
-                      right: 16.w,
-                      top: 16.h,
-                      bottom: 96.h,
-                    ),
-                    child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildDutyCard(
-                        isCheckedIn,
-                        checkInTimeStr,
-                        siteStr,
-                        mileageStr,
-                      ),
-                      SizedBox(height: 16.h),
-                      _buildCameraShortcutCard(),
-                      // SizedBox(height: 6.h),
-                      _buildTasksCard(),
-                      SizedBox(height: 16.h),
-                      _buildDutiesCard(),
-                      SizedBox(height: 16.h),
-                      // _buildStatsGrid(),
-                      // SizedBox(height: 16.h),
-                      _buildRecentAttendanceCard(),
-                      SizedBox(height: 16.h),
-                      _buildRecentEarningsCard(),
-                      SizedBox(height: 16.h),
-                      _buildRecentMileageCard(),
-                      SizedBox(height: 16.h),
-                      _buildAttentionSection(),
-                    ],
-                  ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
       ),
     );
   }
@@ -461,7 +466,6 @@ class _HomeScreen3State extends State<HomeScreen3> {
                   const CheckOutRequested(0.0, 0.0),
                 );
               } else {
-                // Open uniform verification before allowing check-in.
                 final bloc = context.read<AttendanceBloc>();
                 context.push(AppRoutes.uniformVerification, extra: bloc);
               }
@@ -586,17 +590,29 @@ class _HomeScreen3State extends State<HomeScreen3> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildTaskStatColumn('${_home?.tasks.assigned ?? 0}', 'ACCEPTED',
-                  AppColors.primary),
+              _buildTaskStatColumn(
+                '${_home?.tasks.assigned ?? 0}',
+                'ACCEPTED',
+                AppColors.primary,
+              ),
               Container(width: 1, height: 24.h, color: const Color(0xFFE5E8EE)),
-              _buildTaskStatColumn('${_home?.tasks.completed ?? 0}',
-                  'COMPLETED', const Color(0xFF127A45)),
+              _buildTaskStatColumn(
+                '${_home?.tasks.completed ?? 0}',
+                'COMPLETED',
+                const Color(0xFF127A45),
+              ),
               Container(width: 1, height: 24.h, color: const Color(0xFFE5E8EE)),
-              _buildTaskStatColumn('${_home?.tasks.pending ?? 0}', 'PENDING',
-                  const Color(0xFF9A6411)),
+              _buildTaskStatColumn(
+                '${_home?.tasks.pending ?? 0}',
+                'PENDING',
+                const Color(0xFF9A6411),
+              ),
               Container(width: 1, height: 24.h, color: const Color(0xFFE5E8EE)),
-              _buildTaskStatColumn('${_home?.tasks.onTimePct ?? 0}%', 'ON TIME',
-                  const Color(0xFF0B0F1A)),
+              _buildTaskStatColumn(
+                '${_home?.tasks.onTimePct ?? 0}%',
+                'ON TIME',
+                const Color(0xFF0B0F1A),
+              ),
             ],
           ),
           SizedBox(height: 16.h),
@@ -1053,6 +1069,7 @@ class _HomeScreen3State extends State<HomeScreen3> {
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 10.sp,
+                      fontWeight: FontWeight.w500,
                       fontFamily: 'AirbnbCereal',
                     ),
                   ),
@@ -1159,9 +1176,15 @@ class _HomeScreen3State extends State<HomeScreen3> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildDutyStat(_hm(_home?.duties.avgShiftMinutes ?? 0), 'Avg Shift'),
+              _buildDutyStat(
+                _hm(_home?.duties.avgShiftMinutes ?? 0),
+                'Avg Shift',
+              ),
               Container(width: 1, height: 24.h, color: const Color(0xFFE5E8EE)),
-              _buildDutyStat('${_num(_home?.duties.totalHours ?? 0)}h', 'Total Hrs'),
+              _buildDutyStat(
+                '${_num(_home?.duties.totalHours ?? 0)}h',
+                'Total Hrs',
+              ),
               Container(width: 1, height: 24.h, color: const Color(0xFFE5E8EE)),
               _buildDutyStat('${_home?.duties.shiftsDone ?? 0}', 'Shifts Done'),
             ],
@@ -1210,46 +1233,53 @@ class _HomeScreen3State extends State<HomeScreen3> {
               ),
             )
           else
-            ...(_home!.duties.recent.take(3).map((d) => Padding(
-                  padding: EdgeInsets.only(bottom: 8.h),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 28.w,
-                        height: 28.w,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3F5F9),
-                          borderRadius: BorderRadius.circular(9.r),
+            ...(_home!.duties.recent
+                .take(3)
+                .map(
+                  (d) => Padding(
+                    padding: EdgeInsets.only(bottom: 8.h),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 28.w,
+                          height: 28.w,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F5F9),
+                            borderRadius: BorderRadius.circular(9.r),
+                          ),
+                          child: Icon(
+                            LucideIcons.clock,
+                            color: const Color(0xFF9AA2B1),
+                            size: 13.sp,
+                          ),
                         ),
-                        child: Icon(LucideIcons.clock,
-                            color: const Color(0xFF9AA2B1), size: 13.sp),
-                      ),
-                      SizedBox(width: 10.w),
-                      Expanded(
-                        child: Text(
-                          d.date != null
-                              ? DateFormat('EEE, MMM d').format(d.date!)
-                              : '—',
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: Text(
+                            d.date != null
+                                ? DateFormat('EEE, MMM d').format(d.date!)
+                                : '—',
+                            style: TextStyle(
+                              color: const Color(0xFF0B0F1A),
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'AirbnbCereal',
+                            ),
+                          ),
+                        ),
+                        Text(
+                          _hm(d.workedMinutes),
                           style: TextStyle(
-                            color: const Color(0xFF0B0F1A),
+                            color: const Color(0xFF5A6373),
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             fontFamily: 'AirbnbCereal',
                           ),
                         ),
-                      ),
-                      Text(
-                        _hm(d.workedMinutes),
-                        style: TextStyle(
-                          color: const Color(0xFF5A6373),
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'AirbnbCereal',
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ))),
+                )),
         ],
       ),
     );
@@ -1551,17 +1581,29 @@ class _HomeScreen3State extends State<HomeScreen3> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildAttendanceStat('${_home?.attendanceWeek.present ?? 0}',
-                  'Present', const Color(0xFF127A45)),
+              _buildAttendanceStat(
+                '${_home?.attendanceWeek.present ?? 0}',
+                'Present',
+                const Color(0xFF127A45),
+              ),
               Container(width: 1, height: 20.h, color: const Color(0xFFE5E8EE)),
-              _buildAttendanceStat('${_home?.attendanceWeek.late ?? 0}', 'Late',
-                  const Color(0xFF9A6411)),
+              _buildAttendanceStat(
+                '${_home?.attendanceWeek.late ?? 0}',
+                'Late',
+                const Color(0xFF9A6411),
+              ),
               Container(width: 1, height: 20.h, color: const Color(0xFFE5E8EE)),
-              _buildAttendanceStat('${_home?.attendanceWeek.absent ?? 0}',
-                  'Absent', const Color(0xFFC23B36)),
+              _buildAttendanceStat(
+                '${_home?.attendanceWeek.absent ?? 0}',
+                'Absent',
+                const Color(0xFFC23B36),
+              ),
               Container(width: 1, height: 20.h, color: const Color(0xFFE5E8EE)),
-              _buildAttendanceStat('${_home?.attendanceWeek.holiday ?? 0}',
-                  'Holiday', const Color(0xFF5A6373)),
+              _buildAttendanceStat(
+                '${_home?.attendanceWeek.holiday ?? 0}',
+                'Holiday',
+                const Color(0xFF5A6373),
+              ),
             ],
           ),
         ],
@@ -1603,8 +1645,8 @@ class _HomeScreen3State extends State<HomeScreen3> {
             (
               p.payDate ?? '',
               p.monthLabel,
-              '₹${NumberFormat('#,##0').format(p.netPay)}'
-            )
+              '₹${NumberFormat('#,##0').format(p.netPay)}',
+            ),
           ];
 
     return Container(
@@ -1756,16 +1798,18 @@ class _HomeScreen3State extends State<HomeScreen3> {
     final v = m?.vehicle;
     final trips = (m?.recentTrips ?? const [])
         .take(3)
-        .map((t) => (
-              t.date != null ? DateFormat('MMM d').format(t.date!) : '',
-              (t.fromLabel != null && t.toLabel != null)
-                  ? '${t.fromLabel} → ${t.toLabel}'
-                  : (t.date != null
+        .map(
+          (t) => (
+            t.date != null ? DateFormat('MMM d').format(t.date!) : '',
+            (t.fromLabel != null && t.toLabel != null)
+                ? '${t.fromLabel} → ${t.toLabel}'
+                : (t.date != null
                       ? DateFormat('EEE, MMM d').format(t.date!)
                       : 'Trip'),
-              '${_num(t.miles)} mi',
-              '₹${NumberFormat('#,##0').format(t.amount)}',
-            ))
+            '${_num(t.miles)} mi',
+            '₹${NumberFormat('#,##0').format(t.amount)}',
+          ),
+        )
         .toList();
 
     return Container(
