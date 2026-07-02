@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:presshop_enterprise/features/notifications/data/services/enterprise_fcm_service.dart';
@@ -12,6 +13,7 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../common/widgets/employee_app_bar.dart';
 
 import '../../../dashboard/presentation/screens/dashboard_screen.dart';
+import '../../../app_settings/presentation/cubit/app_settings_cubit.dart';
 
 const _iconsPath = 'assets/icons/';
 const Color colorLightGrey = Color(0xFFF3F5F4);
@@ -358,6 +360,8 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    // Server-driven visibility (defaults to all-visible before first load).
+    final menu = context.watch<AppSettingsCubit>().current.menu;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: EmployeeAppBar(
@@ -498,30 +502,33 @@ class _MenuScreenState extends State<MenuScreen> {
                 iconBgColor: const Color(0xFFE6F9F2),
                 onTap: () => _open('${AppRoutes.evidence}?hideLeading=false'),
               ),
-              _MenuGroupItem(
-                name: 'Submit form',
-                iconPath: '${_iconsPath}ic_form_icon1.svg',
-                iconColor: const Color(0xFF7B61FF),
-                iconBgColor: const Color(0xFFF0EEFF),
-                iconSize: size.width * 0.078,
-                onTap: () => _open(AppRoutes.submitForms),
-              ),
-              _MenuGroupItem(
-                name: 'Track mileage',
-                iconPath: '${_iconsPath}ic_mileage.png',
-                iconColor: const Color(0xFFF59E0B),
-                iconBgColor: const Color(0xFFFFF8EC),
-                iconSize: size.width * 0.068,
-                onTap: () => _open(AppRoutes.trackMileage),
-              ),
-              _MenuGroupItem(
-                name: 'Claim expenses',
-                iconPath: '${_iconsPath}ic_expenses.png',
-                iconColor: const Color(0xFF10B981),
-                iconBgColor: const Color(0xFFD1FAE5),
-                iconSize: size.width * 0.070,
-                onTap: () => _open(AppRoutes.claimExpenses),
-              ),
+              if (menu.form)
+                _MenuGroupItem(
+                  name: 'Submit form',
+                  iconPath: '${_iconsPath}ic_form_icon1.svg',
+                  iconColor: const Color(0xFF7B61FF),
+                  iconBgColor: const Color(0xFFF0EEFF),
+                  iconSize: size.width * 0.078,
+                  onTap: () => _open(AppRoutes.submitForms),
+                ),
+              if (menu.mileage)
+                _MenuGroupItem(
+                  name: 'Track mileage',
+                  iconPath: '${_iconsPath}ic_mileage.png',
+                  iconColor: const Color(0xFFF59E0B),
+                  iconBgColor: const Color(0xFFFFF8EC),
+                  iconSize: size.width * 0.068,
+                  onTap: () => _open(AppRoutes.trackMileage),
+                ),
+              if (menu.claimExpenses)
+                _MenuGroupItem(
+                  name: 'Claim expenses',
+                  iconPath: '${_iconsPath}ic_expenses.png',
+                  iconColor: const Color(0xFF10B981),
+                  iconBgColor: const Color(0xFFD1FAE5),
+                  iconSize: size.width * 0.070,
+                  onTap: () => _open(AppRoutes.claimExpenses),
+                ),
             ],
           ),
 
@@ -547,21 +554,23 @@ class _MenuScreenState extends State<MenuScreen> {
                 iconBgColor: const Color(0xFFFFE4E6),
                 onTap: () => _open(AppRoutes.attendance),
               ),
-              _MenuGroupItem(
-                name: 'Payslip',
-                iconPath: '${_iconsPath}ic_piggy.png',
-                iconColor: const Color(0xFF10B981),
-                iconBgColor: const Color(0xFFD1FAE5),
-                iconSize: size.width * 0.076,
-                onTap: () => _open(AppRoutes.payslip),
-              ),
-              _MenuGroupItem(
-                name: 'View earnings',
-                iconPath: '${_iconsPath}ic_view_earnings.svg',
-                iconColor: const Color(0xFFF59E0B),
-                iconBgColor: const Color(0xFFFEF3C7),
-                onTap: () => _open(AppRoutes.earnings),
-              ),
+              if (menu.payslip)
+                _MenuGroupItem(
+                  name: 'Payslip',
+                  iconPath: '${_iconsPath}ic_piggy.png',
+                  iconColor: const Color(0xFF10B981),
+                  iconBgColor: const Color(0xFFD1FAE5),
+                  iconSize: size.width * 0.076,
+                  onTap: () => _open(AppRoutes.payslip),
+                ),
+              if (menu.viewEarnings)
+                _MenuGroupItem(
+                  name: 'View earnings',
+                  iconPath: '${_iconsPath}ic_view_earnings.svg',
+                  iconColor: const Color(0xFFF59E0B),
+                  iconBgColor: const Color(0xFFFEF3C7),
+                  onTap: () => _open(AppRoutes.earnings),
+                ),
               _MenuGroupItem(
                 name: 'My documents',
                 iconPath: '${_iconsPath}ic_upload_documents.png',
@@ -616,40 +625,43 @@ class _MenuScreenState extends State<MenuScreen> {
             title: 'MORE',
             size: size,
             items: [
-              _MenuGroupItem(
-                name: 'FAQs',
-                iconPath: '${_iconsPath}ic_faq.png',
-                iconColor: const Color(0xFF7B61FF),
-                iconBgColor: const Color(0xFFF0EEFF),
-                onTap: () => _open(
-                  AppRoutes.faq,
-                  extra: {
-                    'priceTipsSelected': false,
-                    'type': 'faq',
-                    'index': 0,
-                  },
+              if (menu.faq)
+                _MenuGroupItem(
+                  name: 'FAQs',
+                  iconPath: '${_iconsPath}ic_faq.png',
+                  iconColor: const Color(0xFF7B61FF),
+                  iconBgColor: const Color(0xFFF0EEFF),
+                  onTap: () => _open(
+                    AppRoutes.faq,
+                    extra: {
+                      'priceTipsSelected': false,
+                      'type': 'faq',
+                      'index': 0,
+                    },
+                  ),
                 ),
-              ),
-              _MenuGroupItem(
-                name: 'Legal T&Cs',
-                iconPath: '${_iconsPath}ic_legal.svg',
-                iconColor: const Color(0xFF3B82F6),
-                iconBgColor: const Color(0xFFEFF6FF),
-                iconSize: size.width * 0.062,
-                onTap: () =>
-                    _open(AppRoutes.termCheck, extra: {'type': 'legal'}),
-              ),
-              _MenuGroupItem(
-                name: 'Privacy policy',
-                iconPath: '${_iconsPath}ic_privacy.svg',
-                iconColor: const Color(0xFF7B61FF),
-                iconBgColor: const Color(0xFFF0EEFF),
-                iconSize: size.width * 0.068,
-                onTap: () => _open(
-                  AppRoutes.termCheck,
-                  extra: {'type': 'privacy_policy'},
+              if (menu.legalTerms)
+                _MenuGroupItem(
+                  name: 'Legal T&Cs',
+                  iconPath: '${_iconsPath}ic_legal.svg',
+                  iconColor: const Color(0xFF3B82F6),
+                  iconBgColor: const Color(0xFFEFF6FF),
+                  iconSize: size.width * 0.062,
+                  onTap: () =>
+                      _open(AppRoutes.termCheck, extra: {'type': 'legal'}),
                 ),
-              ),
+              if (menu.privacyPolicy)
+                _MenuGroupItem(
+                  name: 'Privacy policy',
+                  iconPath: '${_iconsPath}ic_privacy.svg',
+                  iconColor: const Color(0xFF7B61FF),
+                  iconBgColor: const Color(0xFFF0EEFF),
+                  iconSize: size.width * 0.068,
+                  onTap: () => _open(
+                    AppRoutes.termCheck,
+                    extra: {'type': 'privacy_policy'},
+                  ),
+                ),
 
               // _MenuGroupItem(
               //   name: 'Contact Us',

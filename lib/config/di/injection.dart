@@ -42,6 +42,8 @@ import '../../features/team_chat/data/datasources/team_chat_remote_datasource.da
 import '../../features/team_chat/data/repositories/team_chat_repository_impl.dart';
 import '../../features/team_chat/domain/repositories/team_chat_repository.dart';
 import '../../features/team_chat/presentation/bloc/team_chat_bloc.dart';
+import '../../features/team_chat/presentation/bloc/team_chat_list_bloc.dart';
+import '../../features/team_chat/presentation/bloc/colleagues_cubit.dart';
 
 // Submit Forms
 import '../../features/submit_forms/data/datasources/submit_forms_remote_datasource.dart';
@@ -90,6 +92,12 @@ import '../../features/dashboard/data/datasources/home_remote_datasource.dart';
 import '../../features/dashboard/data/repositories/home_repository_impl.dart';
 import '../../features/dashboard/domain/repositories/home_repository.dart';
 import '../../features/dashboard/presentation/bloc/home_bloc.dart';
+
+// App Settings
+import '../../features/app_settings/data/datasources/app_settings_remote_datasource.dart';
+import '../../features/app_settings/data/repositories/app_settings_repository_impl.dart';
+import '../../features/app_settings/domain/repositories/app_settings_repository.dart';
+import '../../features/app_settings/presentation/cubit/app_settings_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -149,6 +157,8 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton(() => TeamChatRemoteDataSource(getIt()));
   getIt.registerLazySingleton<TeamChatRepository>(() => TeamChatRepositoryImpl(getIt()));
   getIt.registerFactory(() => TeamChatBloc(getIt()));
+  getIt.registerFactory(() => TeamChatListBloc(getIt()));
+  getIt.registerFactory(() => ColleaguesCubit(getIt()));
 
   // Submit Forms
   getIt.registerLazySingleton(() => SubmitFormsRemoteDataSource(getIt()));
@@ -198,4 +208,10 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<HomeRepository>(
       () => HomeRepositoryImpl(getIt()));
   getIt.registerFactory(() => HomeBloc(getIt()));
+
+  // App Settings
+  getIt.registerLazySingleton(() => AppSettingsRemoteDatasource(getIt()));
+  getIt.registerLazySingleton<AppSettingsRepository>(
+      () => AppSettingsRepositoryImpl(getIt()));
+  getIt.registerFactory(() => AppSettingsCubit(getIt(), getIt()));
 }

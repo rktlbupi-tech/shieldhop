@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/socket/socket_events.dart';
 import '../../../../core/network/socket/socket_manager.dart';
 
@@ -12,6 +13,61 @@ class TeamChatRemoteDataSource {
     final res = await _client.get(
       'chat-v2/conversations/$conversationId/messages',
       queryParameters: {'limit': limit},
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  // ── Peer chat — see docs/api/peer-chat.md ──────────────────────────────────
+
+  /// `GET chat-v2/app/colleagues` — same-org teammates picker.
+  Future<Map<String, dynamic>> getColleagues({
+    String? search,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final res = await _client.get(
+      ApiEndpoints.chatColleagues,
+      queryParameters: {
+        if (search != null && search.isNotEmpty) 'search': search,
+        'page': page,
+        'limit': limit,
+      },
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  /// `GET chat-v2/conversations` — the caller's conversation list.
+  Future<Map<String, dynamic>> getConversations({
+    String? chatMode,
+    int limit = 20,
+    String? cursor,
+  }) async {
+    final res = await _client.get(
+      ApiEndpoints.chatConversations,
+      queryParameters: {
+        if (chatMode != null && chatMode.isNotEmpty) 'chatMode': chatMode,
+        'limit': limit,
+        if (cursor != null) 'cursor': cursor,
+      },
+    );
+    return res.data as Map<String, dynamic>;
+  }
+
+  /// `POST chat-v2/conversations` — create a direct/group chat. Never include self.
+  Future<Map<String, dynamic>> createConversation({
+    required String channelType,
+    String? title,
+    required List<String> memberIds,
+  }) async {
+    final res = await _client.post(
+      ApiEndpoints.chatConversations,
+      data: {
+        'channelType': channelType,
+        if (title != null && title.isNotEmpty) 'title': title,
+        'members': memberIds
+            .map((id) => {'memberType': 'enterprise_user', 'memberId': id})
+            .toList(),
+      },
     );
     return res.data as Map<String, dynamic>;
   }

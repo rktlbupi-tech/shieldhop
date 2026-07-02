@@ -71,12 +71,15 @@ import '../../features/documents/presentation/screens/document_preview_screen.da
 import '../../features/documents/domain/entities/document_entity.dart';
 
 // Map & Chat
-import '../../features/map/presentation/screens/team_chat_list_page.dart';
+import '../../features/team_chat/presentation/screens/team_chat_screen_v2.dart';
 import '../../features/team_chat/presentation/screens/team_chat_message_page.dart';
 
 // Settings
 import '../../features/settings/presentation/screens/faq_screen.dart';
 import '../../features/settings/presentation/screens/term_check_screen.dart';
+
+// App Settings (server-driven route visibility guard)
+import '../../features/app_settings/presentation/cubit/app_settings_cubit.dart';
 
 // Common
 import '../../common/widgets/coming_soon_screen.dart';
@@ -153,6 +156,23 @@ GoRouter createRouter(SharedPreferences prefs) {
       if (token == null && !isAuth) return AppRoutes.login;
 
       if (token != null && isAuth) return AppRoutes.dashboard;
+
+      // Server-driven visibility: make routes for hidden menu items unreachable
+      // (deep links / stale pushes). Flags are cached by AppSettingsCubit and
+      // default to visible when unknown. Legal & Privacy share /term-check, so
+      // they are gated at the menu-item level only, not here.
+      const guardedRoutes = <String, String>{
+        AppRoutes.submitForms: AppSettingsMenuKeys.form,
+        AppRoutes.trackMileage: AppSettingsMenuKeys.mileage,
+        AppRoutes.claimExpenses: AppSettingsMenuKeys.claimExpenses,
+        AppRoutes.payslip: AppSettingsMenuKeys.payslip,
+        AppRoutes.earnings: AppSettingsMenuKeys.viewEarnings,
+        AppRoutes.faq: AppSettingsMenuKeys.faq,
+      };
+      final guardKey = guardedRoutes[state.matchedLocation];
+      if (guardKey != null && !AppSettingsPrefs.menuVisible(prefs, guardKey)) {
+        return AppRoutes.dashboard;
+      }
 
       return null;
     },
@@ -266,7 +286,7 @@ GoRouter createRouter(SharedPreferences prefs) {
       ),
       GoRoute(
         path: AppRoutes.teamChatList,
-        builder: (context, state) => const TeamChatListPage(),
+        builder: (context, state) => const TeamChatScreenV2(),
       ),
       GoRoute(
         path: AppRoutes.faq,

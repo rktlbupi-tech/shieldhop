@@ -189,13 +189,6 @@ class _TeamChatScreenV2ViewState extends State<_TeamChatScreenV2View> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _startDirectChat(context),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        tooltip: 'New chat',
-        child: const Icon(Icons.add_comment_rounded),
-      ),
       appBar: AppAppBar(
         title: 'Team Chat',
         showBack: true,
@@ -281,10 +274,8 @@ class _TeamChatScreenV2ViewState extends State<_TeamChatScreenV2View> {
     final groups = state.groupChats.where(_matches).toList();
     final directs = state.directChats.where(_matches).toList();
 
-    final searching = _query.isNotEmpty;
-    // While searching, if nothing matches, show the search empty state.
-    if (searching && org.isEmpty && groups.isEmpty && directs.isEmpty) {
-      return _buildEmpty(context);
+    if (org.isEmpty && groups.isEmpty && directs.isEmpty) {
+      return _buildEmpty();
     }
 
     return RefreshIndicator(
@@ -308,8 +299,6 @@ class _TeamChatScreenV2ViewState extends State<_TeamChatScreenV2View> {
               ),
             ),
           ],
-          // Individual chats — the section always shows when not searching, with
-          // a "no chat yet" row that opens the colleague picker to start one.
           if (directs.isNotEmpty) ...[
             _SectionHeader(
               title: 'Individual Team Chat',
@@ -321,67 +310,8 @@ class _TeamChatScreenV2ViewState extends State<_TeamChatScreenV2View> {
                 onTap: () => _openConversation(context, c),
               ),
             ),
-          ] else if (!searching) ...[
-            const _SectionHeader(title: 'Individual Team Chat'),
-            _buildDirectEmptyRow(context),
           ],
         ],
-      ),
-    );
-  }
-
-  /// Resting-state placeholder shown under "Individual Team Chat" when the user
-  /// has not started any 1:1 yet. Tapping opens the colleague picker.
-  Widget _buildDirectEmptyRow(BuildContext context) {
-    return InkWell(
-      onTap: () => _startDirectChat(context),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-        child: Row(
-          children: [
-            Container(
-              width: 46.r,
-              height: 46.r,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.08),
-              ),
-              child: Icon(
-                Icons.person_add_alt_1,
-                color: AppColors.primary,
-                size: 22.sp,
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'No individual chat yet',
-                    style: TextStyle(
-                      fontFamily: _kFont,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    'Tap to start a chat with a teammate',
-                    style: TextStyle(
-                      fontFamily: _kFont,
-                      fontSize: 12.sp,
-                      color: AppColors.textHint,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: AppColors.textHint, size: 20.sp),
-          ],
-        ),
       ),
     );
   }
@@ -541,7 +471,7 @@ class _TeamChatScreenV2ViewState extends State<_TeamChatScreenV2View> {
     );
   }
 
-  Widget _buildEmpty(BuildContext context) {
+  Widget _buildEmpty() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -564,33 +494,11 @@ class _TeamChatScreenV2ViewState extends State<_TeamChatScreenV2View> {
           if (_query.isEmpty) ...[
             SizedBox(height: 6.h),
             Text(
-              'Start a direct chat with a teammate.',
+              'Use the menu to start a new chat.',
               style: TextStyle(
                 fontFamily: _kFont,
                 fontSize: 12.sp,
                 color: AppColors.textHint,
-              ),
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton.icon(
-              onPressed: () => _startDirectChat(context),
-              icon: const Icon(Icons.add_comment_rounded, size: 18),
-              label: Text(
-                'Start a chat',
-                style: TextStyle(
-                  fontFamily: _kFont,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
               ),
             ),
           ],
@@ -681,7 +589,12 @@ class _ChatTile extends StatelessWidget {
                           convo.title.isNotEmpty ? convo.title : 'Chat',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.bodyMediumW400numD036,
+                          style: TextStyle(
+                            fontFamily: _kFont,
+                            fontSize: 14.5.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
                       if (convo.lastMessageAt != null)
@@ -761,11 +674,7 @@ class _UnreadBadge extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  Avatar
-//  • individual → one circle (network image, else coloured initials)
-//  • group      → two overlapping circles so it reads as a group. The conversation
-//    list API only exposes a single group face, so the front circle is a neutral
-//    grey placeholder (the "second member" we don't have data for).
+//  Avatar (network image, group icon, or initials circle)
 // ─────────────────────────────────────────────────────────────────────────────
 class _ChatAvatar extends StatelessWidget {
   final String title;
@@ -782,62 +691,49 @@ class _ChatAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dim = size.r;
-    if (!isGroup) {
-      return _face(dim, title, avatarImage);
-    }
-
-    // Group: real face at top-left, grey placeholder face at bottom-right.
-    final circle = dim * 0.68;
-    return SizedBox(
-      width: dim,
-      height: dim,
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            child: _face(circle, title, avatarImage),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-              padding: const EdgeInsets.all(2),
-              child: _greyPlaceholder(circle - 4),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// A single circular face — network image if available, else coloured initials.
-  Widget _face(double dim, String name, String image) {
-    if (image.isEmpty) return _initialsCircle(dim, name);
-    return Container(
-      width: dim,
-      height: dim,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade100),
-      child: ClipOval(
-        child: Image.network(
-          image,
-          fit: BoxFit.cover,
-          errorBuilder: (_, e, s) => _initialsCircle(dim, name),
+    if (avatarImage.isNotEmpty) {
+      return Container(
+        width: dim,
+        height: dim,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey.shade100,
         ),
-      ),
-    );
+        child: ClipOval(
+          child: Image.network(
+            avatarImage,
+            fit: BoxFit.cover,
+            errorBuilder: (_, e, s) => _fallback(dim),
+          ),
+        ),
+      );
+    }
+    return _fallback(dim);
   }
 
-  Widget _initialsCircle(double dim, String name) {
-    final color = _colorFor(name);
+  Widget _fallback(double dim) {
+    if (isGroup) {
+      return Container(
+        width: dim,
+        height: dim,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.primary.withValues(alpha: 0.12),
+        ),
+        child: Icon(Icons.groups, color: AppColors.primary, size: dim * 0.5),
+      );
+    }
+    final color = _colorFor(title);
     return Container(
       width: dim,
       height: dim,
       alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color.withValues(alpha: 0.14)),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.14),
+      ),
       child: Text(
-        _initialsOf(name),
+        _initialsOf(title),
         style: TextStyle(
           fontFamily: _kFont,
           fontSize: dim * 0.36,
@@ -845,16 +741,6 @@ class _ChatAvatar extends StatelessWidget {
           color: color,
         ),
       ),
-    );
-  }
-
-  Widget _greyPlaceholder(double dim) {
-    return Container(
-      width: dim,
-      height: dim,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFFE2E8F0)),
-      child: Icon(Icons.person, size: dim * 0.6, color: const Color(0xFF94A3B8)),
     );
   }
 }
@@ -1334,9 +1220,8 @@ class _ConversationViewState extends State<_ConversationView> {
         builder: (_) => _MediaPreviewScreen(initialItems: captured),
       ),
     );
-    if (previewResult == null || previewResult.isEmpty || !context.mounted) {
+    if (previewResult == null || previewResult.isEmpty || !context.mounted)
       return;
-    }
     final files = previewResult
         .where((e) => e.path.isNotEmpty)
         .map((e) => File(e.path))
@@ -1621,7 +1506,6 @@ class _ConversationViewState extends State<_ConversationView> {
                         controller: _controller,
                         minLines: 1,
                         maxLines: 4,
-                        keyboardType: TextInputType.multiline,
                         onChanged: (_) => _onTyping(context),
                         style: TextStyle(
                           fontFamily: _kFont,
@@ -1635,11 +1519,10 @@ class _ConversationViewState extends State<_ConversationView> {
                             fontSize: 14.sp,
                             color: AppColors.textHint,
                           ),
-                          isCollapsed: true,
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16.w,
-                            vertical: 12.h,
+                            vertical: 10.h,
                           ),
                         ),
                       ),
@@ -1654,24 +1537,17 @@ class _ConversationViewState extends State<_ConversationView> {
   }
 
   Widget _sendOrMicButton(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        if (_isRecording) {
-          return _circleIcon(
-            icon: Icons.send_rounded,
-            onTap: () => _stopAndSend(context),
-          );
-        }
-        if (_controller.text.trim().isNotEmpty) {
-          return _circleIcon(
-            icon: Icons.send_rounded,
-            onTap: () => _send(context),
-          );
-        }
-        return _circleIcon(icon: Icons.mic_none_sharp, onTap: _startRecording);
-      },
-    );
+    final hasText = _controller.text.trim().isNotEmpty;
+    if (_isRecording) {
+      return _circleIcon(
+        icon: Icons.send_rounded,
+        onTap: () => _stopAndSend(context),
+      );
+    }
+    if (hasText) {
+      return _circleIcon(icon: Icons.send_rounded, onTap: () => _send(context));
+    }
+    return _circleIcon(icon: Icons.mic_none_sharp, onTap: _startRecording);
   }
 
   Widget _circleIcon({required IconData icon, required VoidCallback onTap}) {
@@ -1852,7 +1728,6 @@ class _AttachmentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = att.url;
-    if (url.isEmpty) return const SizedBox.shrink();
     switch (att.mediaType) {
       case 'image':
         return Padding(

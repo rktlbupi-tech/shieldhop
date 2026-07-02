@@ -2,14 +2,113 @@ import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import '../../../../core/errors/failures.dart';
+import '../../domain/entities/chat_conversation_entity.dart';
+import '../../domain/entities/colleague_entity.dart';
 import '../../domain/entities/team_chat_message_entity.dart';
 import '../../domain/repositories/team_chat_repository.dart';
 import '../datasources/team_chat_remote_datasource.dart';
+import '../models/chat_conversation_model.dart';
+import '../models/colleague_model.dart';
 import '../models/team_chat_message_model.dart';
+
+/// Chat modes surfaced in the team-chat list (mirrors the legacy app).
+const String _kTeamChatModes =
+    'enterprise-task-group,enterprise-task-direct,hopper-direct,hopper-group,enterprise-org-team';
 
 class TeamChatRepositoryImpl implements TeamChatRepository {
   final TeamChatRemoteDataSource _remoteDataSource;
   TeamChatRepositoryImpl(this._remoteDataSource);
+
+  // ── Peer chat — see docs/api/peer-chat.md ──────────────────────────────────
+
+  @override
+  Future<(ColleaguesPage?, Failure?)> getColleagues({
+    String? search,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getColleagues(
+        search: search,
+        page: page,
+        limit: limit,
+      );
+      if (response['success'] == true && response['data'] is Map) {
+        final inner = Map<String, dynamic>.from(response['data'] as Map);
+        return (ColleaguesPageModel.fromJson(inner), null);
+      }
+      return (null, ServerFailure(response['message']?.toString() ?? 'Failed to load colleagues'));
+    } on Failure catch (f) {
+      return (null, f);
+    } catch (e) {
+      return (null, UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<(List<ChatConversationEntity>?, Failure?)> getConversations({
+    String? chatMode,
+    int limit = 20,
+    String? cursor,
+  }) async {
+    try {
+      final response = await _remoteDataSource.getConversations(
+        chatMode: chatMode ?? _kTeamChatModes,
+        limit: limit,
+        cursor: cursor,
+      );
+      if (response['success'] == true && response['data'] is Map) {
+        final data = Map<String, dynamic>.from(response['data'] as Map);
+        final rawItems = data['items'] as List<dynamic>? ?? const [];
+        final items = rawItems
+            .whereType<Map>()
+            .map((e) => ChatConversationModel.fromJson(Map<String, dynamic>.from(e)).toEntity())
+            .toList();
+        return (items, null);
+      }
+      return (null, ServerFailure(response['message']?.toString() ?? 'Failed to load conversations'));
+    } on NotFoundFailure {
+      return (<ChatConversationEntity>[], null);
+    } on Failure catch (f) {
+      return (null, f);
+    } catch (e) {
+      return (null, UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<(ChatConversationEntity?, Failure?)> createConversation({
+    required String channelType,
+    String? title,
+    required List<String> memberIds,
+    String fallbackTitle = '',
+    String fallbackAvatar = '',
+  }) async {
+    try {
+      final response = await _remoteDataSource.createConversation(
+        channelType: channelType,
+        title: title,
+        memberIds: memberIds,
+      );
+      if (response['success'] == true && response['data'] is Map) {
+        final data = Map<String, dynamic>.from(response['data'] as Map);
+        final convo = ChatConversationModel.fromCreated(
+          data,
+          fallbackTitle: fallbackTitle,
+          fallbackAvatar: fallbackAvatar,
+        ).toEntity();
+        if (convo.id.isEmpty) {
+          return (null, const ServerFailure('Chat created but no id was returned'));
+        }
+        return (convo, null);
+      }
+      return (null, ServerFailure(response['message']?.toString() ?? 'Failed to create chat'));
+    } on Failure catch (f) {
+      return (null, f);
+    } catch (e) {
+      return (null, UnknownFailure(e.toString()));
+    }
+  }
 
   @override
   Future<(List<TeamChatMessageEntity>?, Failure?)> getMessages(

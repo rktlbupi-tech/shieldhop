@@ -13,6 +13,7 @@ import '../../../map/presentation/screens/team_map_screen.dart';
 import '../../../map/presentation/bloc/map_cubit.dart';
 import '../../../map/presentation/bloc/employee_map_cubit.dart';
 import '../../../menu/presentation/screens/menu_screen.dart';
+import '../../../app_settings/presentation/cubit/app_settings_cubit.dart';
 import '../../../../config/di/injection.dart';
 import '../../../../core/utils/location_permission_helper.dart';
 
@@ -34,7 +35,8 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => DashboardScreenState();
 }
 
-class DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen>
+    with WidgetsBindingObserver {
   late int _currentIndex;
   bool _mapOpenSos = false;
   bool _mapOpenShareAlert = false;
@@ -43,6 +45,7 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   late final AttendanceBloc _attendanceBloc;
   late final ProfileBloc _profileBloc;
+  late final AppSettingsCubit _appSettingsCubit;
   late final MapCubit _mapCubit;
   late final EmployeeMapCubit _employeeMapCubit;
   late final Widget _evidenceScreen;
@@ -54,8 +57,10 @@ class DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    WidgetsBinding.instance.addObserver(this);
     _attendanceBloc = getIt<AttendanceBloc>()..add(const FetchAttendanceLog());
     _profileBloc = getIt<ProfileBloc>()..add(const FetchProfile());
+    _appSettingsCubit = getIt<AppSettingsCubit>()..fetch();
     _mapCubit = MapCubit();
     _employeeMapCubit = EmployeeMapCubit();
     _evidenceScreen = const EvidenceScreen(hideLeading: true);
@@ -85,7 +90,19 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Re-fetch visibility config on resume so operator changes apply without a
+    // reinstall. Silent so the surfaces don't flash a loader.
+    if (state == AppLifecycleState.resumed) {
+      _appSettingsCubit.fetch(silent: true);
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _appSettingsCubit.close();
     _mapCubit.close();
     _employeeMapCubit.close();
     super.dispose();
@@ -138,8 +155,11 @@ class DashboardScreenState extends State<DashboardScreen> {
       _menuScreen,
     ];
 
-    return BlocProvider.value(
-      value: _profileBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _profileBloc),
+        BlocProvider.value(value: _appSettingsCubit),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.surface,
         body: IndexedStack(index: _currentIndex, children: screens),

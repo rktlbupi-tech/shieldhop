@@ -77,6 +77,16 @@ class ClearTeamChatErrorEvent extends TeamChatEvent {
   const ClearTeamChatErrorEvent();
 }
 
+/// Raised from a socket ack callback (which resolves after the send handler has
+/// already completed) so the error is surfaced via a fresh event handler instead
+/// of an illegal late `emit`.
+class TeamChatSendFailedEvent extends TeamChatEvent {
+  final String message;
+  const TeamChatSendFailedEvent(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
 // ── States ───────────────────────────────────────────────────────────────────
 class TeamChatState extends Equatable {
   final List<TeamChatMessageEntity> messages;
@@ -130,6 +140,7 @@ class TeamChatBloc extends Bloc<TeamChatEvent, TeamChatState> {
     on<SendTeamChatMediaEvent>(_onSendMedia);
     on<SendTeamChatTypingInputEvent>(_onTypingInput);
     on<ClearTeamChatErrorEvent>((e, emit) => emit(state.copyWith(errorMessage: null)));
+    on<TeamChatSendFailedEvent>((e, emit) => emit(state.copyWith(errorMessage: e.message)));
   }
 
   Future<void> _onInit(InitTeamChatEvent event, Emitter<TeamChatState> emit) async {
@@ -240,8 +251,7 @@ class TeamChatBloc extends Bloc<TeamChatEvent, TeamChatState> {
       text: event.text,
       onResult: (success, error) {
         if (!success) {
-          add(ClearTeamChatErrorEvent()); // clear error
-          emit(state.copyWith(errorMessage: error ?? 'Failed to send message'));
+          add(TeamChatSendFailedEvent(error ?? 'Failed to send message'));
         }
       },
     );
@@ -272,7 +282,7 @@ class TeamChatBloc extends Bloc<TeamChatEvent, TeamChatState> {
         mediaAssetIds: assetIds,
         onResult: (success, error) {
           if (!success) {
-            emit(state.copyWith(errorMessage: error ?? 'Failed to send media'));
+            add(TeamChatSendFailedEvent(error ?? 'Failed to send media'));
           }
         },
       );

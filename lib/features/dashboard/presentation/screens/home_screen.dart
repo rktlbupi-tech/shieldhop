@@ -16,6 +16,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../bloc/home_bloc.dart';
 import '../../domain/entities/home_entities.dart';
+import '../../../app_settings/presentation/cubit/app_settings_cubit.dart';
 import 'dashboard_screen.dart';
 
 class HomeScreen3 extends StatefulWidget {
@@ -144,6 +145,8 @@ class _HomeScreen3State extends State<HomeScreen3> {
 
   @override
   Widget build(BuildContext context) {
+    // Server-driven visibility (defaults to all-visible before first load).
+    final dash = context.watch<AppSettingsCubit>().current.dashboard;
     return BlocProvider.value(
       value: _homeBloc,
       child: MultiBlocListener(
@@ -257,21 +260,29 @@ class _HomeScreen3State extends State<HomeScreen3> {
                             mileageStr,
                           ),
                           SizedBox(height: 16.h),
-                          _buildCameraShortcutCard(),
-                          // SizedBox(height: 6.h),
-                          _buildTasksCard(),
-                          SizedBox(height: 16.h),
-                          _buildDutiesCard(),
-                          SizedBox(height: 16.h),
-                          // _buildStatsGrid(),
-                          // SizedBox(height: 16.h),
-                          _buildRecentAttendanceCard(),
-                          SizedBox(height: 16.h),
-                          _buildRecentEarningsCard(),
-                          SizedBox(height: 16.h),
-                          _buildRecentMileageCard(),
-                          SizedBox(height: 16.h),
-                          _buildAttentionSection(),
+                          // Camera card carries its own bottom margin.
+                          if (dash.captureMoment) _buildCameraShortcutCard(),
+                          if (dash.task) ...[
+                            _buildTasksCard(),
+                            SizedBox(height: 16.h),
+                          ],
+                          if (dash.duties) ...[
+                            _buildDutiesCard(),
+                            SizedBox(height: 16.h),
+                          ],
+                          if (dash.attendance) ...[
+                            _buildRecentAttendanceCard(),
+                            SizedBox(height: 16.h),
+                          ],
+                          if (dash.viewEarnings) ...[
+                            _buildRecentEarningsCard(),
+                            SizedBox(height: 16.h),
+                          ],
+                          if (dash.mileageTrips) ...[
+                            _buildRecentMileageCard(),
+                            SizedBox(height: 16.h),
+                          ],
+                          if (dash.needsAttention) _buildAttentionSection(),
                         ],
                       ),
                     ),

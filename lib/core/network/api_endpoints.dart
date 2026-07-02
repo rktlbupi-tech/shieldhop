@@ -79,6 +79,16 @@ class ApiEndpoints {
   // See docs/api/home.md
   static const String home = 'enterprise/app/home';
 
+  // ── App Settings (worker app — self-scoped visibility config) ─
+  // See docs/api/app-settings.md
+  static const String appSettings = 'enterprise/app/app-settings';
+
+  // ── Team chat (chat-v2 peer chat) ────────────────────────
+  // See docs/api/peer-chat.md
+  static const String chatColleagues = 'chat-v2/app/colleagues';
+  static const String chatConversations = 'chat-v2/conversations';
+  // Messages history: chat-v2/conversations/<id>/messages
+
   // ── Map / Heatmap ────────────────────────────────────────
   static const String heatmapLocation = 'enterprise/heatmap/location';
   static const String heatmapWorkers = 'enterprise/heatmap/workers';
